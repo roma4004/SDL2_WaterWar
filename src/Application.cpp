@@ -87,8 +87,8 @@ bool Application::loop() {
             cout << "Event type: " << e.key.keysym.scancode << endl;    
         }
         if (e.type == SDL_MOUSEMOTION) {
-            cout << "Event type: " << "x: " << e.motion.x/40 << " y: " << e.motion.y/40 << endl;
             game.setMouseCoordinates(e.motion.x, e.motion.y);
+            game.setSquareLocation(e.motion.x, e.motion.y);
         }
     }
 
