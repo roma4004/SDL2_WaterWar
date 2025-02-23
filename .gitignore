@@ -5,6 +5,19 @@
 .vs
 cmake-build-debug
 
+# Ninja build files
+.ninja_deps
+.ninja_log
+build.ninja
+
+# Cmake output dep files
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles
+bin
+_deps
+
+
 # Compiled files
 x64/
 x32/
