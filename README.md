@@ -4,3 +4,6 @@
 ## Actions to build 
 - Run CMake CMakeList.txt
 - Run ninja
+
+## Contributors
+Yevhenii Lysiak
