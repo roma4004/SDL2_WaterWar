@@ -9,13 +9,13 @@ public:
     Application();
     ~Application();
     bool init();
-    void run();
+    void gameLoop();
     void kill();
     static bool fps_debugging;
     static bool snake_position_debugging;
 
 private:
-    bool loop();
+    bool handleInput();
     void calculateFPS();
 
     Game game;

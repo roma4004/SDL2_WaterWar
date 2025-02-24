@@ -36,7 +36,7 @@ bool Application::init() {
     return true;
 }
 
-void Application::run() {
+void Application::gameLoop() {
     Uint32 frameStart;
     int frameTime;
     int screen_width = 720;
@@ -46,9 +46,13 @@ void Application::run() {
     int size = grid_size * (fild_size -1);
     
 
-    while (loop()) {
+
+    while (handleInput()) {
         // Start counting time
         frameStart = SDL_GetTicks();
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
         for (int y = 0; y < fild_size; y++) {
@@ -58,10 +62,9 @@ void Application::run() {
             SDL_RenderDrawLine(renderer, 0, y * grid_size,  size, y * grid_size);
         }
 
-        game.update();
+        game.drawSelectedSquare(renderer);
 
         game.render(renderer);
-        // SDL_RenderClear(renderer);
 
         SDL_RenderPresent(renderer);
 
@@ -77,7 +80,7 @@ void Application::run() {
     }
 }
 
-bool Application::loop() {
+bool Application::handleInput() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) {
@@ -86,9 +89,13 @@ bool Application::loop() {
         if (e.type == SDL_KEYDOWN) {
             cout << "Event type: " << e.key.keysym.scancode << endl;    
         }
-        if (e.type == SDL_MOUSEMOTION) {
-            game.setMouseCoordinates(e.motion.x, e.motion.y);
-            game.setSquareLocation(e.motion.x, e.motion.y);
+        if (e.type == SDL_MOUSEMOTION){
+            game.setMouseCoordinates(e.button.x, e.button.y);
+            game.setSquareLocation(e.button.x, e.button.y);
+        }
+        if (e.type == SDL_MOUSEBUTTONDOWN) {
+            cout << "Event type: " << "x: " << e.button.x/40 << " y: " << e.button.y/40 << endl;
+            //game.setMouseCoordinates(e.button.x, e.button.y);
         }
     }
 
