@@ -4,17 +4,23 @@
 #include <SDL.h>
 
 class Renderer {
+
+    SDL_Window* window;
+
+    void setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+    void drawLine(int x1, int y1, int x2, int y2);
+
 public:
+    SDL_Renderer* renderer;
+
     Renderer();
+
     ~Renderer();
+
     bool init();
     void clear();
     void present();
-    void kill();
-
-private:
-    SDL_Window* window;
-    SDL_Renderer* renderer;
+    void killSdl();
 };
 
 #endif // RENDERER_H

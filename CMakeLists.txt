@@ -47,6 +47,7 @@ set(SOURCES
     src/Application.cpp
     src/Renderer.cpp
     src/Game.cpp
+    src/GameTable.cpp
 )
 
 # Create executable

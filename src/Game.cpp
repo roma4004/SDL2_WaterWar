@@ -29,6 +29,17 @@ void Game::setSquareLocation(int x, int y){
     cout << "Square location: " << "x: " << this->indexX << " y: " << this->indexY << endl;
 }
 
+void Game::saveSelectedSquare() {
+    this->listOfCubes.push_back(this->highlightedSquare);
+}
+
+void Game::drawSquareList(SDL_Renderer *renderer) {
+    for (auto& square : this->listOfCubes) {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &square);
+    }
+}
+
 void Game::drawSelectedSquare(SDL_Renderer *renderer) {
     if (this->indexX > this->tableSize - 1 || this->indexY > this->tableSize - 1)
         return;

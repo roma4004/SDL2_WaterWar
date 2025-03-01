@@ -3,7 +3,7 @@
 Renderer::Renderer() : window(nullptr), renderer(nullptr) {}
 
 Renderer::~Renderer() {
-    kill();
+    killSdl();
 }
 
 bool Renderer::init() {
@@ -30,7 +30,17 @@ void Renderer::present() {
     SDL_RenderPresent(renderer);
 }
 
-void Renderer::kill() {
+void Renderer::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+}
+
+void Renderer::drawLine(int x1, int y1, int x2, int y2) {
+    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+}
+
+
+
+void Renderer::killSdl() {
     if (renderer) {
         SDL_DestroyRenderer(renderer);
         renderer = nullptr;

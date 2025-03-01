@@ -3,25 +3,23 @@
 
 #include "Renderer.h"
 #include "Game.h"
+#include "GameTable.h"
 
 class Application {
 public:
     Application();
+
     ~Application();
+
+    Renderer* renderer;
     bool init();
     void gameLoop();
-    void kill();
-    static bool fps_debugging;
-    static bool snake_position_debugging;
 
 private:
     bool handleInput();
     void calculateFPS();
 
     Game game;
-
-    static SDL_Window* window;
-    static SDL_Renderer* renderer;
 
     const int FPS = 60; // Desired FPS
     const int frameDelay = 1000 / FPS; // Frame delay in milliseconds

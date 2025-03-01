@@ -1,72 +1,50 @@
 #include "Application.h"
+#include "Renderer.h"
+#include "GameTable.h"
 #include <iostream>
 
 using namespace std;
 
-// Define static members
-SDL_Window* Application::window = nullptr;
-SDL_Renderer* Application::renderer = nullptr;
-
-// Debug
-bool Application::fps_debugging = false;
-bool Application::snake_position_debugging = false;
-
-
-Application::Application() : frameCount(0), lastTime(0) {}
-
-Application::~Application() {
-    kill();
+Application::Application() : frameCount(0), lastTime(0) {
 }
 
 bool Application::init() {
-    // Initialize SDL and create window and renderer
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        return false;
+    this->renderer = new Renderer();
+    // Will initialize window and renderer SDL on init() action
+    if (renderer->init()){
+        game.init();
+
+        return true;
     }
-    window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 720, 480, SDL_WINDOW_SHOWN);
-    if (!window) {
-        return false;
-    }
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (!renderer) {
-        return false;
-    }
-    game.init();
-    
-    return true;
+
+    return false;
+}
+
+Application::~Application() {
+
 }
 
 void Application::gameLoop() {
     Uint32 frameStart;
     int frameTime;
-    int screen_width = 720;
-    int screen_height = 480;
-    int grid_size = 40;
-    int fild_size = 11;
-    int size = grid_size * (fild_size -1);
-    
-
+    GameTable *gameTable = new GameTable();
 
     while (handleInput()) {
         // Start counting time
         frameStart = SDL_GetTicks();
+        // Clear "buffer" before every screen generation
+        renderer->clear();
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+        gameTable->draw(renderer->renderer);
 
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-        for (int y = 0; y < fild_size; y++) {
-            for (int x = 0; x < fild_size; x++){
-                SDL_RenderDrawLine(renderer, x * grid_size, 0, x * grid_size, size);
-            }
-            SDL_RenderDrawLine(renderer, 0, y * grid_size,  size, y * grid_size);
-        }
+        // Draw highlighted square
+        game.drawSelectedSquare(renderer->renderer);
 
-        game.drawSelectedSquare(renderer);
+        game.drawSquareList(renderer->renderer);
 
-        game.render(renderer);
+        game.render(renderer->renderer);
 
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(renderer->renderer);
 
         // Starting time minus time spend on handling events, updating and rendering
         frameTime = SDL_GetTicks() - frameStart;
@@ -95,23 +73,11 @@ bool Application::handleInput() {
         }
         if (e.type == SDL_MOUSEBUTTONDOWN) {
             cout << "Event type: " << "x: " << e.button.x/40 << " y: " << e.button.y/40 << endl;
-            //game.setMouseCoordinates(e.button.x, e.button.y);
+            game.saveSelectedSquare();
         }
     }
 
     return true;
-}
-
-void Application::kill() {
-    if (renderer) {
-        SDL_DestroyRenderer(renderer);
-        renderer = nullptr;
-    }
-    if (window) {
-        SDL_DestroyWindow(window);
-        window = nullptr;
-    }
-    SDL_Quit();
 }
 
 void Application::calculateFPS() {
