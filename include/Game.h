@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <vector>
 #include "GameTable.h"
+#include "Boat.h"
 
 class Game {
 public:
@@ -15,6 +16,10 @@ public:
     void render(SDL_Renderer* renderer);
     void setMouseCoordinates(int x, int y);
     void setSquareLocation(int x, int y);
+    bool getIsVertical();
+    void setIsVertical(bool isVertical);
+    void setShipSize(int shipSize);
+    int getShipSize();
     void drawSelectedSquare(SDL_Renderer* renderer);
     void saveSelectedSquare();
     void drawSquareList(SDL_Renderer* renderer);
@@ -29,7 +34,7 @@ private:
     int gridSize = 40;
     int tableSize = 10;
     //SDL_Rect selectedSquare;
-    SDL_Rect highlightedSquare{0,0, 38,38};
+    SDL_Rect highlightedSquare{0, 0, 39, 39};
 
 };
 

@@ -65,11 +65,32 @@ bool Application::handleInput() {
             return false;
         }
         if (e.type == SDL_KEYDOWN) {
-            cout << "Event type: " << e.key.keysym.scancode << endl;    
+            if (e.key.keysym.scancode == SDL_SCANCODE_R) {
+                game.setIsVertical(!game.getIsVertical());
+            }
+
+            if (e.key.keysym.scancode == SDL_SCANCODE_1) {
+                game.setShipSize(1);
+            }
+            else if (e.key.keysym.scancode == SDL_SCANCODE_2)
+            {
+                game.setShipSize(2);
+            }
+            else if (e.key.keysym.scancode == SDL_SCANCODE_3)
+            {
+                game.setShipSize(3);
+            }
+            else if (e.key.keysym.scancode == SDL_SCANCODE_4)
+            {
+                game.setShipSize(4);
+            }
+
+            cout << "Event type: " << e.key.keysym.scancode << endl;
         }
+
         if (e.type == SDL_MOUSEMOTION){
             game.setMouseCoordinates(e.button.x, e.button.y);
-            game.setSquareLocation(e.button.x, e.button.y);
+            game.setSquareLocation(e.button.x+1, e.button.y+1);
         }
         if (e.type == SDL_MOUSEBUTTONDOWN) {
             cout << "Event type: " << "x: " << e.button.x/40 << " y: " << e.button.y/40 << endl;
@@ -87,7 +108,5 @@ void Application::calculateFPS() {
         cout << "FPS: " << frameCount << endl;
         frameCount = 0;
         lastTime = currentTime;
-
-        
     }
 }

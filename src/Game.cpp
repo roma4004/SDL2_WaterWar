@@ -30,13 +30,17 @@ void Game::setSquareLocation(int x, int y){
 }
 
 void Game::saveSelectedSquare() {
-    this->listOfCubes.push_back(this->highlightedSquare);
+    // confirm validation
+    this->boats.emplace_back(this->highlightedSquare, getShipSize(), getIsVertical());
 }
 
 void Game::drawSquareList(SDL_Renderer *renderer) {
-    for (auto& square : this->listOfCubes) {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &square);
+    for (const auto& boat : this->boats) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        for (const auto& boatPart : boat.body) {
+            const auto rect = boatPart.getRect();
+            SDL_RenderFillRect(renderer, &rect);
+        }
     }
 }
 
@@ -52,4 +56,20 @@ void Game::drawSelectedSquare(SDL_Renderer *renderer) {
 }
 
 void Game::render(SDL_Renderer* renderer) {}
+
+void Game::setIsVertical(bool isVertical) {
+    _isVertical = isVertical;
+}
+
+void Game::setShipSize(int shipSize) {
+    _shipSize = shipSize;
+}
+
+bool Game::getIsVertical() {
+    return _isVertical;
+}
+
+int Game::getShipSize() {
+    return _shipSize;
+}
 
