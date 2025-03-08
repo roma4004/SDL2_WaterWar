@@ -52,7 +52,22 @@ void Game::drawSelectedSquare(SDL_Renderer *renderer) {
     this->highlightedSquare.y = this->indexY * this->gridSize + 1;
 
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderFillRect(renderer, &this->highlightedSquare);
+    auto hRect = this->highlightedSquare;
+    const int size = getShipSize();
+    const bool isVertical = getIsVertical();
+    SDL_Rect rect;
+    for (int i = 0; i < size; i++) {
+        if (isVertical)
+        {
+            rect = SDL_Rect{hRect.x, hRect.y + (hRect.h + 1) * i, hRect.w, hRect.h };
+        }
+        else
+        {
+            rect = SDL_Rect{hRect.x + (hRect.w + 1) * i, hRect.y, hRect.w, hRect.h};
+        }
+
+        SDL_RenderFillRect(renderer, &rect);
+    }
 }
 
 void Game::render(SDL_Renderer* renderer) {}
