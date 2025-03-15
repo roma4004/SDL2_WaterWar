@@ -12,13 +12,18 @@ void Game::init() {}
 
 void Game::update() {
     if (gameOver) return;
-    
 }
 
 void Game::setMouseRotateAdjust()
 {
     this->indexX = this->mouseX / this->gridSize;
     this->indexY = this->mouseY / this->gridSize;
+    if (this->indexX >= this->tableSize
+    || this->indexY >= this->tableSize)
+    {
+        return;
+    }
+
     if (_isVertical) {
         if (this->indexY + _shipSize > this->tableSize) {
             this->indexY += this->tableSize - (this->indexY + _shipSize);
@@ -31,7 +36,7 @@ void Game::setMouseRotateAdjust()
         }
     }
 
-    cout << "rotate: " << "x: " << this->indexX << " y: " << this->indexY << endl;
+    cout << "adjusted to: " << "x: " << this->indexX << " y: " << this->indexY << endl;
 }
 
 void Game::setMouseCoordinates(int x, int y) {
@@ -43,6 +48,13 @@ void Game::setMouseCoordinates(int x, int y) {
 void Game::setSquareLocation(int x, int y){
     this->indexX = x / this->gridSize;
     this->indexY = y / this->gridSize;
+
+    if ( this->indexX >= this->tableSize
+    || this->indexY >= this->tableSize)
+    {
+        return;
+    }
+
     if (_isVertical) {
         if (this->indexY + _shipSize > this->tableSize) {
             this->indexY = 10 - _shipSize;
@@ -63,6 +75,11 @@ void Game::setSquareLocation(int x, int y){
 
 void Game::saveSelectedSquare() {
     // confirm validation
+    if ( this->indexX >= this->tableSize
+    || this->indexY >= this->tableSize) {
+        return;
+    }
+
     this->boats.emplace_back(this->highlightedSquare, getShipSize(), getIsVertical());
 }
 
