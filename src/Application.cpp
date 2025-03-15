@@ -38,7 +38,7 @@ void Application::gameLoop() {
         gameTable->draw(renderer->renderer);
 
         // Draw highlighted square
-        game.drawSelectedSquare(renderer->renderer);
+        game.drawHighlightedSquare(renderer->renderer);
 
         game.drawSquareList(renderer->renderer);
 
@@ -67,22 +67,27 @@ bool Application::handleInput() {
         if (e.type == SDL_KEYDOWN) {
             if (e.key.keysym.scancode == SDL_SCANCODE_R) {
                 game.setIsVertical(!game.getIsVertical());
+                game.setMouseRotateAdjust();
             }
 
             if (e.key.keysym.scancode == SDL_SCANCODE_1) {
                 game.setShipSize(1);
+                game.setMouseRotateAdjust();
             }
             else if (e.key.keysym.scancode == SDL_SCANCODE_2)
             {
                 game.setShipSize(2);
+                game.setMouseRotateAdjust();
             }
             else if (e.key.keysym.scancode == SDL_SCANCODE_3)
             {
                 game.setShipSize(3);
+                game.setMouseRotateAdjust();
             }
             else if (e.key.keysym.scancode == SDL_SCANCODE_4)
             {
                 game.setShipSize(4);
+                game.setMouseRotateAdjust();
             }
 
             cout << "Event type: " << e.key.keysym.scancode << endl;
@@ -90,7 +95,7 @@ bool Application::handleInput() {
 
         if (e.type == SDL_MOUSEMOTION){
             game.setMouseCoordinates(e.button.x, e.button.y);
-            game.setSquareLocation(e.button.x+1, e.button.y+1);
+            game.setSquareLocation(e.button.x, e.button.y);
         }
         if (e.type == SDL_MOUSEBUTTONDOWN) {
             cout << "Event type: " << "x: " << e.button.x/40 << " y: " << e.button.y/40 << endl;

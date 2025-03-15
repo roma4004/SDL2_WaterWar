@@ -15,6 +15,25 @@ void Game::update() {
     
 }
 
+void Game::setMouseRotateAdjust()
+{
+    this->indexX = this->mouseX / this->gridSize;
+    this->indexY = this->mouseY / this->gridSize;
+    if (_isVertical) {
+        if (this->indexY + _shipSize > this->tableSize) {
+            this->indexY += this->tableSize - (this->indexY + _shipSize);
+        }
+    }
+    else
+    {
+        if (this->indexX + _shipSize > this->tableSize) {
+            this->indexX += this->tableSize - (this->indexX + _shipSize);
+        }
+    }
+
+    cout << "rotate: " << "x: " << this->indexX << " y: " << this->indexY << endl;
+}
+
 void Game::setMouseCoordinates(int x, int y) {
     this->mouseX = x;
     this->mouseY = y;
@@ -22,9 +41,22 @@ void Game::setMouseCoordinates(int x, int y) {
 }
 
 void Game::setSquareLocation(int x, int y){
-
     this->indexX = x / this->gridSize;
     this->indexY = y / this->gridSize;
+    if (_isVertical) {
+        if (this->indexY + _shipSize > this->tableSize) {
+            this->indexY = 10 - _shipSize;
+            return;
+        }
+    }
+    else
+    {
+        if (this->indexX + _shipSize > this->tableSize) {
+            this->indexX = 10 - _shipSize;
+            return;
+        }
+    }
+
 
     cout << "Square location: " << "x: " << this->indexX << " y: " << this->indexY << endl;
 }
@@ -44,7 +76,7 @@ void Game::drawSquareList(SDL_Renderer *renderer) {
     }
 }
 
-void Game::drawSelectedSquare(SDL_Renderer *renderer) {
+void Game::drawHighlightedSquare(SDL_Renderer *renderer) {
     if (this->indexX > this->tableSize - 1 || this->indexY > this->tableSize - 1)
         return;
 

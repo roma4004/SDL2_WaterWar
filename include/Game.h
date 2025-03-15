@@ -20,7 +20,7 @@ public:
     void setIsVertical(bool isVertical);
     void setShipSize(int shipSize);
     int getShipSize();
-    void drawSelectedSquare(SDL_Renderer* renderer);
+    void drawHighlightedSquare(SDL_Renderer* renderer);
     void saveSelectedSquare();
     void drawSquareList(SDL_Renderer* renderer);
 
