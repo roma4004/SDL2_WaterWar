@@ -5,13 +5,13 @@
 
 using namespace std;
 
-Application::Application() : frameCount(0), lastTime(0) {
-}
+Application::Application() = default;
 
 bool Application::init() {
     this->renderer = new Renderer();
+
     // Will initialize window and renderer SDL on init() action
-    if (renderer->init()){
+    if (renderer->init()) {
         game.init();
 
         return true;
@@ -20,14 +20,10 @@ bool Application::init() {
     return false;
 }
 
-Application::~Application() {
-
-}
+Application::~Application() = default;
 
 void Application::gameLoop() {
-    Uint32 frameStart;
-    int frameTime;
-    GameTable *gameTable = new GameTable();
+    auto *gameTable = new GameTable();
 
     while (handleInput()) {
         // Start counting time
@@ -64,6 +60,7 @@ bool Application::handleInput() {
         if (e.type == SDL_QUIT) {
             return false;
         }
+
         if (e.type == SDL_KEYDOWN) {
             if (e.key.keysym.scancode == SDL_SCANCODE_R) {
                 game.setIsVertical(!game.getIsVertical());
@@ -73,19 +70,13 @@ bool Application::handleInput() {
             if (e.key.keysym.scancode == SDL_SCANCODE_1) {
                 game.setShipSize(1);
                 game.setMouseRotateAdjust();
-            }
-            else if (e.key.keysym.scancode == SDL_SCANCODE_2)
-            {
+            } else if (e.key.keysym.scancode == SDL_SCANCODE_2) {
                 game.setShipSize(2);
                 game.setMouseRotateAdjust();
-            }
-            else if (e.key.keysym.scancode == SDL_SCANCODE_3)
-            {
+            } else if (e.key.keysym.scancode == SDL_SCANCODE_3) {
                 game.setShipSize(3);
                 game.setMouseRotateAdjust();
-            }
-            else if (e.key.keysym.scancode == SDL_SCANCODE_4)
-            {
+            } else if (e.key.keysym.scancode == SDL_SCANCODE_4) {
                 game.setShipSize(4);
                 game.setMouseRotateAdjust();
             }
@@ -93,12 +84,12 @@ bool Application::handleInput() {
             cout << "Event type: " << e.key.keysym.scancode << endl;
         }
 
-        if (e.type == SDL_MOUSEMOTION){
+        if (e.type == SDL_MOUSEMOTION) {
             game.setMouseCoordinates(e.button.x, e.button.y);
             game.setSquareLocation(e.button.x, e.button.y);
         }
         if (e.type == SDL_MOUSEBUTTONDOWN) {
-            cout << "Event type: " << "x: " << e.button.x/40 << " y: " << e.button.y/40 << endl;
+            cout << "Event type: " << "x: " << e.button.x / 40 << " y: " << e.button.y / 40 << endl;
             game.saveSelectedSquare();
         }
     }

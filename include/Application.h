@@ -11,12 +11,15 @@ public:
 
     ~Application();
 
-    Renderer* renderer;
+    Renderer *renderer{};
+
     bool init();
+
     void gameLoop();
 
 private:
     bool handleInput();
+
     void calculateFPS();
 
     Game game;
@@ -24,10 +27,10 @@ private:
     const int FPS = 60; // Desired FPS
     const int frameDelay = 1000 / FPS; // Frame delay in milliseconds
 
-    Uint32 frameStart;
-    int frameTime;
-    int frameCount;
-    Uint32 lastTime;
+    Uint32 frameStart{};
+    int frameTime{};
+    int frameCount{};
+    Uint32 lastTime{};
 };
 
 #endif // APPLICATION_H

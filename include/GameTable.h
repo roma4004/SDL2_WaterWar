@@ -7,13 +7,14 @@ class GameTable {
 
 public:
     GameTable();
+
     ~GameTable();
-    bool draw(SDL_Renderer *renderer);
+
+    bool draw(SDL_Renderer *renderer) const;
 
 private:
-    int gridSize = 40;
-    int tableSize = 10;
+    int gridSize{40};
+    int tableSize{10};
 };
-
 
 #endif //SDL2_WATERWAR_GAMETABLE_H

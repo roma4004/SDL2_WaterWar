@@ -9,20 +9,34 @@
 class Game {
 public:
     Game();
+
     ~Game();
+
     GameTable gameTable;
+
     void init();
-    void update();
-    void render(SDL_Renderer* renderer);
+
+    void update() const;
+
+    void render(SDL_Renderer *renderer);
+
     void setMouseCoordinates(int x, int y);
+
     void setSquareLocation(int x, int y);
-    bool getIsVertical();
+
+    [[nodiscard]] bool getIsVertical() const;
+
     void setIsVertical(bool isVertical);
+
     void setShipSize(int shipSize);
-    int getShipSize();
-    void drawHighlightedSquare(SDL_Renderer* renderer);
+
+    [[nodiscard]] int getShipSize() const;
+
+    void drawHighlightedSquare(SDL_Renderer *renderer);
+
     void saveSelectedSquare();
-    void drawSquareList(SDL_Renderer* renderer);
+
+    void drawSquareList(SDL_Renderer *renderer);
 
 private:
     std::vector<SDL_Rect> listOfCubes;
@@ -35,7 +49,6 @@ private:
     int tableSize = 10;
     //SDL_Rect selectedSquare;
     SDL_Rect highlightedSquare{0, 0, 39, 39};
-
 };
 
 #endif // GAME_H
