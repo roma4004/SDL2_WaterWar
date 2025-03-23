@@ -16,6 +16,7 @@ public:
 };
 
 class Boat {
+    int _size;
 
 public:
     std::list<BoatPart> body;
@@ -25,6 +26,9 @@ public:
     explicit Boat(std::list<BoatPart> &rect);
 
     explicit Boat(SDL_Rect rect, int size, bool isVertical);
+
+    [[nodiscard]] int getSize() const;
+    void setSize(int size);
 };
 
 

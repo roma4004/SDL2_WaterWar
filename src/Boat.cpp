@@ -15,7 +15,7 @@ void BoatPart::setRect(const SDL_Rect &newRect) {
     _rect = newRect;
 }
 
-Boat::Boat(SDL_Rect rect, int size, bool isVertical) {
+Boat::Boat(SDL_Rect rect, int size, bool isVertical) : _size{size} {
     for (int i = 0; i < size; i++) {
         if (isVertical) {
             body.emplace_back(SDL_Rect{rect.x, rect.y + (rect.h + 1) * i, rect.w, rect.h});
@@ -24,3 +24,6 @@ Boat::Boat(SDL_Rect rect, int size, bool isVertical) {
         }
     }
 }
+
+int Boat::getSize() const { return _size; }
+void Boat::setSize(int size) { _size = size; }

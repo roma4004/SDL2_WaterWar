@@ -31,12 +31,12 @@ void Application::gameLoop() {
         // Clear "buffer" before every screen generation
         renderer->clear();
 
-        gameTable->draw(renderer->renderer);
+        game.drawShipsList(renderer->renderer);
 
         // Draw highlighted square
-        game.drawHighlightedSquare(renderer->renderer);
+        game.drawHighlightedShip(renderer->renderer);
 
-        game.drawSquareList(renderer->renderer);
+        gameTable->draw(renderer->renderer);
 
         game.render(renderer->renderer);
 
@@ -90,7 +90,7 @@ bool Application::handleInput() {
         }
         if (e.type == SDL_MOUSEBUTTONDOWN) {
             cout << "Event type: " << "x: " << e.button.x / 40 << " y: " << e.button.y / 40 << endl;
-            game.saveSelectedSquare();
+            game.SaveSelectedSquare();
         }
     }
 
