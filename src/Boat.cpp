@@ -26,4 +26,5 @@ Boat::Boat(SDL_Rect rect, int size, bool isVertical) : _size{size} {
 }
 
 int Boat::getSize() const { return _size; }
+
 void Boat::setSize(int size) { _size = size; }

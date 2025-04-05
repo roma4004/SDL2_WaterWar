@@ -28,6 +28,7 @@ public:
     explicit Boat(SDL_Rect rect, int size, bool isVertical);
 
     [[nodiscard]] int getSize() const;
+
     void setSize(int size);
 };
 

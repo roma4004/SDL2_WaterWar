@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "EnemyGridShot.h"
+
 #include <iostream>
 #include <SDL.h>
 
@@ -39,7 +41,7 @@ void Game::setMouseRotateAdjust() {
 void Game::setMouseCoordinates(int x, int y) {
     this->mouseX = x;
     this->mouseY = y;
-    cout << "Event type: " << "x: " << this->mouseX << " y: " << this->mouseY << endl;
+    cout << "setMouseCoordinates x: " << this->mouseX << " y: " << this->mouseY << endl;
 }
 
 void Game::setSquareLocation(int x, int y) {
@@ -79,6 +81,18 @@ bool Game::IsCollide(const SDL_Rect &r1, const SDL_Rect &r2) {
     }
 
     // If neither of the above conditions are met, the rectangles overlap
+    return true;
+}
+
+bool Game::CheckEnemySquareCollision(const SDL_Rect &newSquare, const std::vector<EnemyGridShot> &enemyFieldShots) {
+    for (const EnemyGridShot &enemyFieldShot: enemyFieldShots) {
+        const auto rect = newSquare;
+        const auto rect2 = enemyFieldShot.getRect();
+        if (rect.x == rect2.x && rect.y == rect2.y) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -128,27 +142,54 @@ bool Game::CheckShipLimits() {
     return false;
 }
 
+void Game::OnClickSquare() {
+    if (this->mouseX <= tableSize * gridSize) {
+        SaveSelectedSquare();
+        cout << "OnClick our: " << endl;
+    } else {
+        SaveEnemySquare();
+        cout << "OnClick enemy: " << endl;
+    }
+}
+
 void Game::SaveSelectedSquare() {
     // confirm validation
-
     if (this->indexX >= this->tableSize
         || this->indexY >= this->tableSize) {
         return;
     }
 
-    Boat highlightedBoat = Boat(this->highlightedSquare, getShipSize(), getIsVertical());
+    Boat newBoat = Boat(this->highlightedSquare, getShipSize(), getIsVertical());
 
-    if (CheckDirectCollision(highlightedBoat, this->boats)
-        && CheckPaddingCollision(highlightedBoat, this->boats)
+    if (CheckDirectCollision(newBoat, this->ourGridBoats)
+        && CheckPaddingCollision(newBoat, this->ourGridBoats)
         && CheckShipLimits()) {
         const int shipSizeToIndex = getShipSize() - 1;
         ++placedShipCount[shipSizeToIndex];
-        this->boats.emplace_back(this->highlightedSquare, getShipSize(), getIsVertical());
+        this->ourGridBoats.emplace_back(newBoat);
+    }
+}
+
+void Game::SaveEnemySquare() {
+    //TODO: write walidation that shot cannot be done outside enemy grid
+    // confirm validation
+//    if (this->indexX <= this->tableSize * gridSize
+//        || this->indexY <= this->tableSize * gridSize) {
+//        return;
+//    }
+
+    int x = this->mouseX / this->gridSize;
+    int y = this->mouseY / this->gridSize;
+    cout << "SaveEnemySquare x: " << x << endl;
+    cout << "SaveEnemySquare y: " << y << endl;
+    const SDL_Rect enemySquare = SDL_Rect{x * this->gridSize, y * this->gridSize, this->gridSize, this->gridSize};
+    if (CheckEnemySquareCollision(enemySquare, this->enemyGridShots)) {
+        this->enemyGridShots.emplace_back(enemySquare);
     }
 }
 
 void Game::drawShipsList(SDL_Renderer *renderer) {
-    for (const auto &boat: this->boats) {
+    for (const auto &boat: this->ourGridBoats) {
 
         if (!(this->indexX > this->tableSize - 1
               || this->indexY > this->tableSize - 1)) {
@@ -191,6 +232,14 @@ void Game::drawShipsList(SDL_Renderer *renderer) {
     }
 }
 
+void Game::drawEnemyShipsList(SDL_Renderer *renderer) {
+    for (const auto& enemyFieldShot: this->enemyGridShots) {
+        const SDL_Rect rect = enemyFieldShot.getRect();
+        SDL_SetRenderDrawColor(renderer, 0xFF, 45, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+}
+
 void Game::drawHighlightedShip(SDL_Renderer *renderer) {
     if (this->indexX > this->tableSize - 1
         || this->indexY > this->tableSize - 1) {
@@ -201,8 +250,8 @@ void Game::drawHighlightedShip(SDL_Renderer *renderer) {
     this->highlightedSquare.y = this->indexY * this->gridSize + 1;
 
     Boat highlightedBoat = Boat(this->highlightedSquare, getShipSize(), getIsVertical());
-    if (CheckDirectCollision(highlightedBoat, this->boats)
-        && CheckPaddingCollision(highlightedBoat, this->boats)
+    if (CheckDirectCollision(highlightedBoat, this->ourGridBoats)
+        && CheckPaddingCollision(highlightedBoat, this->ourGridBoats)
         && CheckShipLimits()) {
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     } else {

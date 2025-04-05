@@ -5,6 +5,7 @@
 #include <vector>
 #include "GameTable.h"
 #include "Boat.h"
+#include "EnemyGridShot.h"
 
 class Game {
 public:
@@ -34,19 +35,25 @@ public:
 
     void drawHighlightedShip(SDL_Renderer *renderer);
 
-    void SaveSelectedSquare();
-
     void drawShipsList(SDL_Renderer *renderer);
+
+    void drawEnemyShipsList(SDL_Renderer *renderer);
 
     void setMouseRotateAdjust();
 
-    bool IsCollide(const SDL_Rect& r1, const SDL_Rect& r2);
-    bool CheckDirectCollision(const Boat& boat1, const std::vector<Boat>& otherBoats);
-    bool CheckPaddingCollision(const Boat& boat1, const std::vector<Boat>& otherBoats);
+    bool IsCollide(const SDL_Rect &r1, const SDL_Rect &r2);
+
+    bool CheckDirectCollision(const Boat &boat1, const std::vector<Boat> &otherBoats);
+
+    bool CheckPaddingCollision(const Boat &boat1, const std::vector<Boat> &otherBoats);
+
     bool CheckShipLimits();
 
+    void OnClickSquare();
+
 private:
-    std::vector<Boat> boats;
+    std::vector<Boat> ourGridBoats;
+    std::vector<EnemyGridShot> enemyGridShots;
     bool gameOver;
     int mouseX;
     int mouseY;
@@ -61,6 +68,12 @@ private:
 
     //SDL_Rect selectedSquare;
     SDL_Rect highlightedSquare{0, 0, 39, 39};
+
+    void SaveSelectedSquare();
+
+    void SaveEnemySquare();
+
+    static bool CheckEnemySquareCollision(const SDL_Rect &newSquare, const std::vector<EnemyGridShot> &enemyFieldShots);
 };
 
 #endif // GAME_H

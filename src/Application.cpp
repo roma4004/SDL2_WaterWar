@@ -23,7 +23,8 @@ bool Application::init() {
 Application::~Application() = default;
 
 void Application::gameLoop() {
-    auto *gameTable = new GameTable();
+    const auto *ourGameTable = new GameTable();
+    const auto *enemyGameTable = new GameTable({12, 0, 40, 40});
 
     while (handleInput()) {
         // Start counting time
@@ -32,13 +33,15 @@ void Application::gameLoop() {
         renderer->clear();
 
         game.drawShipsList(renderer->renderer);
+        game.drawEnemyShipsList(renderer->renderer);
 
         // Draw highlighted square
         game.drawHighlightedShip(renderer->renderer);
 
-        gameTable->draw(renderer->renderer);
+        ourGameTable->draw(renderer->renderer);
+        enemyGameTable->draw(renderer->renderer);
 
-        game.render(renderer->renderer);
+//        game.render(renderer->renderer);
 
         SDL_RenderPresent(renderer->renderer);
 
@@ -81,7 +84,7 @@ bool Application::handleInput() {
                 game.setMouseRotateAdjust();
             }
 
-            cout << "Event type: " << e.key.keysym.scancode << endl;
+            cout << "Event KEY DOWN: " << e.key.keysym.scancode << endl;
         }
 
         if (e.type == SDL_MOUSEMOTION) {
@@ -89,8 +92,8 @@ bool Application::handleInput() {
             game.setSquareLocation(e.button.x, e.button.y);
         }
         if (e.type == SDL_MOUSEBUTTONDOWN) {
-            cout << "Event type: " << "x: " << e.button.x / 40 << " y: " << e.button.y / 40 << endl;
-            game.SaveSelectedSquare();
+            cout << "Event MOUSE BUTTON DOWN : " << "x: " << e.button.x / 40 << " y: " << e.button.y / 40 << endl;
+            game.OnClickSquare();
         }
     }
 

@@ -49,6 +49,7 @@ set(SOURCES
     src/Game.cpp
     src/GameTable.cpp
     src/Boat.cpp
+    src/EnemyFieldShot.cpp
 )
 
 # Create executable
