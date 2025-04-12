@@ -3,70 +3,102 @@
 
 #include <iostream>
 #include <SDL.h>
+#include <algorithm>
 
 using namespace std;
 
-Game::Game() : gameOver(false), mouseX(0), mouseY(0), indexX(0), indexY(0) {}
+Game::Game() : _gameOver(false), _mouseX(0), _mouseY(0), _indexX(0), _indexY(0) {}
 
 Game::~Game() = default;
 
 void Game::init() {}
 
 void Game::update() const {
-    if (gameOver) return;
+    if (_gameOver) return;
 }
 
-void Game::setMouseRotateAdjust() {
-    this->indexX = this->mouseX / this->gridSize;
-    this->indexY = this->mouseY / this->gridSize;
+void Game::setRotateAdjust() {
+    this->_indexX = this->_mouseX / this->_gridSize;
+    this->_indexY = this->_mouseY / this->_gridSize;
 
-    if (this->indexX >= this->tableSize
-        || this->indexY >= this->tableSize) {
+    constexpr int gridPadding = 2; //TODO: should be class member
+    if (this->_indexX >= _tableSize //right side after one grids
+        ||
+        (this->_indexY >= _tableSize && this->_indexY < _tableSize + gridPadding) //vertical padding between grids
+        || this->_indexY >= _tableSize * 2 + gridPadding) {  //bottom side after two grids
         return;
     }
 
     if (_isVertical) {
-        if (this->indexY + _shipSize > this->tableSize) {
-            this->indexY += this->tableSize - (this->indexY + _shipSize);
+        const int shipHead = this->_indexY;
+        const int shipTail = this->_indexY + _shipSize;
+        if ((shipTail > this->_tableSize &&
+             shipTail <= this->_tableSize + gridPadding) //vertical padding between grids
+            || shipTail > this->_tableSize * 2 + gridPadding //bottom side after two grids
+            || (shipHead == this->_tableSize - 1 &&
+                shipTail > this->_tableSize + gridPadding) //case when tail in different grid
+                ) {
+            if (shipHead > this->_tableSize + gridPadding) {
+                this->_indexY = this->_tableSize * 2 + gridPadding - _shipSize;
+            } else {
+                this->_indexY = this->_tableSize - _shipSize;
+            }
         }
     } else {
-        if (this->indexX + _shipSize > this->tableSize) {
-            this->indexX += this->tableSize - (this->indexX + _shipSize);
+        const int shipTail = this->_indexX + _shipSize;
+        if (shipTail > this->_tableSize) {
+            this->_indexX = this->_tableSize - _shipSize;
         }
     }
 
-    cout << "adjusted to: " << "x: " << this->indexX << " y: " << this->indexY << endl;
+    cout << "adjusted to: " << "x: " << this->_indexX << " y: " << this->_indexY << endl;
 }
 
 void Game::setMouseCoordinates(int x, int y) {
-    this->mouseX = x;
-    this->mouseY = y;
-    cout << "setMouseCoordinates x: " << this->mouseX << " y: " << this->mouseY << endl;
+    this->_mouseX = x;
+    this->_mouseY = y;
+    cout << "setMouseCoordinates x: " << this->_mouseX << " y: " << this->_mouseY << endl;
 }
 
 void Game::setSquareLocation(int x, int y) {
-    this->indexX = x / this->gridSize;
-    this->indexY = y / this->gridSize;
+    this->_indexX = x / this->_gridSize;
+    this->_indexY = y / this->_gridSize;
 
-    if (this->indexX >= this->tableSize
-        || this->indexY >= this->tableSize) {
+    constexpr int gridPadding = 2;
+    if (this->_indexX >= _tableSize //right side after one grids
+        ||
+        (this->_indexY >= _tableSize && this->_indexY < _tableSize + gridPadding) //vertical padding between grids
+        || this->_indexY >= _tableSize * 2 + gridPadding) {  //bottom side after grids
         return;
     }
 
     if (_isVertical) {
-        if (this->indexY + _shipSize > this->tableSize) {
-            this->indexY = 10 - _shipSize;
+        const int shipHead = this->_indexY;
+        const int shipTail = this->_indexY + _shipSize;
+        if ((shipTail > this->_tableSize &&
+             shipTail <= this->_tableSize + gridPadding) //vertical padding between grids
+            || shipTail > this->_tableSize * 2 + gridPadding//bottom side after grids
+            || (shipHead == this->_tableSize - 1 &&
+                shipTail > this->_tableSize + gridPadding)) { //case when tail in different grid
+
+            if (shipHead > this->_tableSize + gridPadding) {
+                this->_indexY = this->_tableSize * 2 + gridPadding - _shipSize;
+            } else {
+                this->_indexY = this->_tableSize - _shipSize;
+            }
+
             return;
         }
     } else {
-        if (this->indexX + _shipSize > this->tableSize) {
-            this->indexX = 10 - _shipSize;
+        const int shipTail = this->_indexX + _shipSize;
+        if (shipTail > this->_tableSize) {
+            this->_indexX = this->_tableSize - _shipSize;
             return;
         }
     }
 
 
-    cout << "Square location: " << "x: " << this->indexX << " y: " << this->indexY << endl;
+    cout << "Square location: " << "x: " << this->_indexX << " y: " << this->_indexY << endl;
 }
 
 bool Game::IsCollide(const SDL_Rect &r1, const SDL_Rect &r2) {
@@ -84,22 +116,17 @@ bool Game::IsCollide(const SDL_Rect &r1, const SDL_Rect &r2) {
     return true;
 }
 
-bool Game::CheckEnemySquareCollision(const SDL_Rect &newSquare, const std::vector<EnemyGridShot> &enemyFieldShots) {
-    for (const EnemyGridShot &enemyFieldShot: enemyFieldShots) {
-        const auto rect = newSquare;
-        const auto rect2 = enemyFieldShot.getRect();
-        if (rect.x == rect2.x && rect.y == rect2.y) {
-            return false;
-        }
-    }
-
-    return true;
+bool Game::CheckEnemySquareCollision(const SDL_Rect &newShot, const std::vector<EnemyGridShot> &enemyFieldShots) {
+    return std::none_of(enemyFieldShots.begin(), enemyFieldShots.end(), [&newShot](const EnemyGridShot &shot) {
+        const auto& oldShot = shot.getRect();
+        return newShot.x == oldShot.x && newShot.y == oldShot.y;
+    });
 }
 
-bool Game::CheckPaddingCollision(const Boat &boat1, const std::vector<Boat> &otherBoats) {
+bool Game::CheckPaddingCollision(const Boat &boat1, const std::vector<Boat> &otherBoats) const {
     const auto paddingHead = SDL_Rect{highlightedSquare.x - highlightedSquare.w - 1,
                                       highlightedSquare.y - highlightedSquare.h - 1};
-    auto paddingTail = (--boat1.body.end())->getRect();
+    auto paddingTail = (--(boat1.body.end()))->getRect();
     paddingTail = {paddingTail.x + paddingTail.w + 1, paddingTail.y + paddingTail.h + 1};
     const auto paddingRect = SDL_Rect{paddingHead.x,
                                       paddingHead.y,
@@ -135,7 +162,7 @@ bool Game::CheckDirectCollision(const Boat &boat1, const std::vector<Boat> &othe
 
 bool Game::CheckShipLimits() {
     const int shipSizeToIndex = getShipSize() - 1;
-    if (placedShipCount[shipSizeToIndex] < placedShipCountLimit[shipSizeToIndex]) {
+    if (_placedShipCount[shipSizeToIndex] < _placedShipCountLimit[shipSizeToIndex]) {
         return true;
     }
 
@@ -143,7 +170,7 @@ bool Game::CheckShipLimits() {
 }
 
 void Game::OnClickSquare() {
-    if (this->mouseX <= tableSize * gridSize) {
+    if (this->_mouseX <= _tableSize * _gridSize) {
         SaveSelectedSquare();
         cout << "OnClick our: " << endl;
     } else {
@@ -154,45 +181,47 @@ void Game::OnClickSquare() {
 
 void Game::SaveSelectedSquare() {
     // confirm validation
-    if (this->indexX >= this->tableSize
-        || this->indexY >= this->tableSize) {
+    if (this->_indexX >= this->_tableSize
+        || this->_indexY >= this->_tableSize) {
         return;
     }
 
     Boat newBoat = Boat(this->highlightedSquare, getShipSize(), getIsVertical());
 
-    if (CheckDirectCollision(newBoat, this->ourGridBoats)
-        && CheckPaddingCollision(newBoat, this->ourGridBoats)
+    if (CheckDirectCollision(newBoat, this->_ourGridBoats)
+        && CheckPaddingCollision(newBoat, this->_ourGridBoats)
         && CheckShipLimits()) {
         const int shipSizeToIndex = getShipSize() - 1;
-        ++placedShipCount[shipSizeToIndex];
-        this->ourGridBoats.emplace_back(newBoat);
+        ++_placedShipCount[shipSizeToIndex];
+        this->_ourGridBoats.emplace_back(newBoat);
     }
 }
 
 void Game::SaveEnemySquare() {
-    //TODO: write walidation that shot cannot be done outside enemy grid
-    // confirm validation
-//    if (this->indexX <= this->tableSize * gridSize
-//        || this->indexY <= this->tableSize * gridSize) {
-//        return;
-//    }
+    int x = this->_indexX;
+    int y = this->_indexY;
+    constexpr int gridPadding = 2;
+    if (x >= _tableSize * 2 + gridPadding //right side after two grids
+        || (y >= _tableSize && y < _tableSize + gridPadding) //vertical padding between grids
+        || (x >= _tableSize && x < _tableSize + gridPadding) //horizontal padding between grids
+        || y >= _tableSize * 2 + gridPadding) {  //bottom side after two grids
+        return;
+    }
 
-    int x = this->mouseX / this->gridSize;
-    int y = this->mouseY / this->gridSize;
     cout << "SaveEnemySquare x: " << x << endl;
     cout << "SaveEnemySquare y: " << y << endl;
-    const SDL_Rect enemySquare = SDL_Rect{x * this->gridSize, y * this->gridSize, this->gridSize, this->gridSize};
-    if (CheckEnemySquareCollision(enemySquare, this->enemyGridShots)) {
-        this->enemyGridShots.emplace_back(enemySquare);
+    const SDL_Rect enemySquare = SDL_Rect{x * this->_gridSize, y * this->_gridSize, this->_gridSize, this->_gridSize};
+    if (CheckEnemySquareCollision(enemySquare, this->_enemyGridShots)) {
+        this->_enemyGridShots.emplace_back(enemySquare);
     }
 }
 
 void Game::drawShipsList(SDL_Renderer *renderer) {
-    for (const auto &boat: this->ourGridBoats) {
+    for (const auto &boat: this->_ourGridBoats) {
 
-        if (!(this->indexX > this->tableSize - 1
-              || this->indexY > this->tableSize - 1)) {
+        if (!(this->_indexX > this->_tableSize - 1
+              || this->_indexY > this->_tableSize - 1)) {
+
             //count ship padding
             auto boatHeadRect = (*boat.body.begin()).getRect();
             const auto paddingHead = SDL_Rect{boatHeadRect.x - (boatHeadRect.x <= 1 ? 0 : boatHeadRect.w) - 1,
@@ -211,19 +240,18 @@ void Game::drawShipsList(SDL_Renderer *renderer) {
             for (const auto &boatPart: boat.body) {
                 const auto rect2 = boatPart.getRect();
                 if (IsCollide(paddingRect, rect2)) {
-                    if (paddingRect.x + paddingRect.w > this->tableSize * gridSize) {
-                        paddingRect.w -= gridSize;
+                    if (paddingRect.x + paddingRect.w > this->_tableSize * _gridSize) {
+                        paddingRect.w -= _gridSize;
                     }
-                    if (paddingRect.y + paddingRect.h > this->tableSize * gridSize) {
-                        paddingRect.h -= gridSize;
+                    if (paddingRect.y + paddingRect.h > this->_tableSize * _gridSize) {
+                        paddingRect.h -= _gridSize;
                     }
                     SDL_RenderFillRect(renderer, &paddingRect);
                 }
             }
         }
 
-
-        //Direct ship draw
+        //draw ship
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         for (const auto &boatPart: boat.body) {
             const auto rect = boatPart.getRect();
@@ -232,8 +260,8 @@ void Game::drawShipsList(SDL_Renderer *renderer) {
     }
 }
 
-void Game::drawEnemyShipsList(SDL_Renderer *renderer) {
-    for (const auto& enemyFieldShot: this->enemyGridShots) {
+void Game::drawPlayerShotList(SDL_Renderer *renderer) {
+    for (const auto &enemyFieldShot: this->_enemyGridShots) {
         const SDL_Rect rect = enemyFieldShot.getRect();
         SDL_SetRenderDrawColor(renderer, 0xFF, 45, 0, 255);
         SDL_RenderFillRect(renderer, &rect);
@@ -241,30 +269,32 @@ void Game::drawEnemyShipsList(SDL_Renderer *renderer) {
 }
 
 void Game::drawHighlightedShip(SDL_Renderer *renderer) {
-    if (this->indexX > this->tableSize - 1
-        || this->indexY > this->tableSize - 1) {
+    int x = this->_indexX;
+    int y = this->_indexY;
+    constexpr int gridPadding = 2;
+    if (x >= _tableSize //right side after one grids
+        || (y >= _tableSize && y < _tableSize + gridPadding) //vertical padding between two grids
+        || y >= _tableSize * 2 + gridPadding) {  //bottom side after two grids
         return;
     }
 
-    this->highlightedSquare.x = this->indexX * this->gridSize + 1;
-    this->highlightedSquare.y = this->indexY * this->gridSize + 1;
+    this->highlightedSquare.x = x * this->_gridSize + 1;
+    this->highlightedSquare.y = y * this->_gridSize + 1;
 
     Boat highlightedBoat = Boat(this->highlightedSquare, getShipSize(), getIsVertical());
-    if (CheckDirectCollision(highlightedBoat, this->ourGridBoats)
-        && CheckPaddingCollision(highlightedBoat, this->ourGridBoats)
+    if (CheckDirectCollision(highlightedBoat, this->_ourGridBoats)
+        && CheckPaddingCollision(highlightedBoat, this->_ourGridBoats)
         && CheckShipLimits()) {
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     } else {
-
         SDL_SetRenderDrawColor(renderer, 127, 0, 0, 255);
     }
-
 
     auto hRect = this->highlightedSquare;
     const int size = getShipSize();
     const bool isVertical = getIsVertical();
     SDL_Rect rect;
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; ++i) {
         if (isVertical) {
             rect = SDL_Rect{hRect.x, hRect.y + (hRect.h + 1) * i, hRect.w, hRect.h};
         } else {

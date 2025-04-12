@@ -8,16 +8,23 @@ GameTable::~GameTable() = default;
 
 bool GameTable::draw(SDL_Renderer *renderer) const {
     // Draw the grid
-    int size = _rect.w * (tableSize);
+    int lineSizeX = _rect.w * (tableSize);
+    int lineSizeY = _rect.h * (tableSize);
+    int xOffset = _rect.x;
+    int yOffset = _rect.y;
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-    for (int y = _rect.y; y <= tableSize + _rect.y; ++y) {
-        for (int x = _rect.x; x <= tableSize + _rect.x; ++x) {
-            SDL_RenderDrawLine(renderer, x * _rect.w, y, x * _rect.w, size); // vertical line
+
+    for (int y = yOffset; y <= tableSize + yOffset; ++y) {
+        for (int x = xOffset; x <= tableSize + xOffset; ++x) {
+            SDL_RenderDrawLine(renderer,
+                               x * _rect.w, y * _rect.h,
+                               x * _rect.w, yOffset * _rect.h + lineSizeY); // vertical line
         }
-        SDL_RenderDrawLine(renderer, _rect.x * _rect.w, y * _rect.h,
-                           _rect.x * _rect.w + size, y * _rect.h); // horizontal line
+
+        SDL_RenderDrawLine(renderer,
+                           xOffset * _rect.w, y * _rect.h,
+                           xOffset * _rect.w + lineSizeX, y * _rect.h); // horizontal line
     }
 
     return true;
 }
-

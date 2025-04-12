@@ -23,8 +23,11 @@ bool Application::init() {
 Application::~Application() = default;
 
 void Application::gameLoop() {
-    const auto *ourGameTable = new GameTable();
-    const auto *enemyGameTable = new GameTable({12, 0, 40, 40});
+    const auto *playerShipFild = new GameTable();
+    const auto *playerShotFild = new GameTable({12, 0, 40, 40});
+
+    const auto *enemyShipFild = new GameTable({0, 12, 40, 40});
+    const auto *enemyShotFild = new GameTable({12, 12, 40, 40});
 
     while (handleInput()) {
         // Start counting time
@@ -33,13 +36,16 @@ void Application::gameLoop() {
         renderer->clear();
 
         game.drawShipsList(renderer->renderer);
-        game.drawEnemyShipsList(renderer->renderer);
+        game.drawPlayerShotList(renderer->renderer);
 
         // Draw highlighted square
         game.drawHighlightedShip(renderer->renderer);
 
-        ourGameTable->draw(renderer->renderer);
-        enemyGameTable->draw(renderer->renderer);
+        playerShipFild->draw(renderer->renderer);
+        playerShotFild->draw(renderer->renderer);
+
+        enemyShipFild->draw(renderer->renderer);
+        enemyShotFild->draw(renderer->renderer);
 
 //        game.render(renderer->renderer);
 
@@ -67,21 +73,21 @@ bool Application::handleInput() {
         if (e.type == SDL_KEYDOWN) {
             if (e.key.keysym.scancode == SDL_SCANCODE_R) {
                 game.setIsVertical(!game.getIsVertical());
-                game.setMouseRotateAdjust();
+                game.setRotateAdjust();
             }
 
             if (e.key.keysym.scancode == SDL_SCANCODE_1) {
                 game.setShipSize(1);
-                game.setMouseRotateAdjust();
+                game.setRotateAdjust();
             } else if (e.key.keysym.scancode == SDL_SCANCODE_2) {
                 game.setShipSize(2);
-                game.setMouseRotateAdjust();
+                game.setRotateAdjust();
             } else if (e.key.keysym.scancode == SDL_SCANCODE_3) {
                 game.setShipSize(3);
-                game.setMouseRotateAdjust();
+                game.setRotateAdjust();
             } else if (e.key.keysym.scancode == SDL_SCANCODE_4) {
                 game.setShipSize(4);
-                game.setMouseRotateAdjust();
+                game.setRotateAdjust();
             }
 
             cout << "Event KEY DOWN: " << e.key.keysym.scancode << endl;

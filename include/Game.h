@@ -37,33 +37,33 @@ public:
 
     void drawShipsList(SDL_Renderer *renderer);
 
-    void drawEnemyShipsList(SDL_Renderer *renderer);
+    void drawPlayerShotList(SDL_Renderer *renderer);
 
-    void setMouseRotateAdjust();
+    void setRotateAdjust();
 
-    bool IsCollide(const SDL_Rect &r1, const SDL_Rect &r2);
+    [[nodiscard]] static bool IsCollide(const SDL_Rect &r1, const SDL_Rect &r2);
 
-    bool CheckDirectCollision(const Boat &boat1, const std::vector<Boat> &otherBoats);
+    [[nodiscard]] static bool CheckDirectCollision(const Boat &boat1, const std::vector<Boat> &otherBoats);
 
-    bool CheckPaddingCollision(const Boat &boat1, const std::vector<Boat> &otherBoats);
+    [[nodiscard]] bool CheckPaddingCollision(const Boat &boat1, const std::vector<Boat> &otherBoats) const;
 
-    bool CheckShipLimits();
+    [[nodiscard]] bool CheckShipLimits();
 
     void OnClickSquare();
 
 private:
-    std::vector<Boat> ourGridBoats;
-    std::vector<EnemyGridShot> enemyGridShots;
-    bool gameOver;
-    int mouseX;
-    int mouseY;
-    int indexX;
-    int indexY;
-    int gridSize = 40;
-    int tableSize = 10;
+    std::vector<Boat> _ourGridBoats;
+    std::vector<EnemyGridShot> _enemyGridShots;
+    bool _gameOver;
+    int _mouseX;
+    int _mouseY;
+    int _indexX;
+    int _indexY;
+    int _gridSize = 40;
+    int _tableSize = 10;
     int _shipSize = 1;
-    int placedShipCount[4]{0};
-    int placedShipCountLimit[4]{4, 3, 2, 1};
+    int _placedShipCount[4]{0};
+    int _placedShipCountLimit[4]{4, 3, 2, 1};
     bool _isVertical = false;
 
     //SDL_Rect selectedSquare;
@@ -73,7 +73,7 @@ private:
 
     void SaveEnemySquare();
 
-    static bool CheckEnemySquareCollision(const SDL_Rect &newSquare, const std::vector<EnemyGridShot> &enemyFieldShots);
+    [[nodiscard]] static bool CheckEnemySquareCollision(const SDL_Rect &shot, const std::vector<EnemyGridShot> &enemyFieldShots);
 };
 
 #endif // GAME_H
