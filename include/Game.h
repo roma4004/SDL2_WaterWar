@@ -5,7 +5,7 @@
 #include <vector>
 #include "GameTable.h"
 #include "Boat.h"
-#include "EnemyGridShot.h"
+#include "GridShot.h"
 
 class Game {
 public:
@@ -35,25 +35,25 @@ public:
 
     void drawHighlightedShip(SDL_Renderer *renderer);
 
-    void drawShipsList(SDL_Renderer *renderer);
+    void drawPlayerShips(SDL_Renderer *renderer);
 
-    void drawPlayerShotList(SDL_Renderer *renderer);
+    void drawPlayerShots(SDL_Renderer *renderer);
 
     void setRotateAdjust();
 
     [[nodiscard]] static bool IsCollide(const SDL_Rect &r1, const SDL_Rect &r2);
 
-    [[nodiscard]] static bool CheckDirectCollision(const Boat &boat1, const std::vector<Boat> &otherBoats);
+    [[nodiscard]] static bool IsBoatCollideOtherBoats(const Boat &newBoat, const std::vector<Boat> &otherBoats);
 
-    [[nodiscard]] bool CheckPaddingCollision(const Boat &boat1, const std::vector<Boat> &otherBoats) const;
+    [[nodiscard]] static bool IsBoatsCollidePaddingRect(const Boat &boat, const std::vector<Boat> &otherBoats) ;
 
-    [[nodiscard]] bool CheckShipLimits();
+    [[nodiscard]] bool IsShipLimitReached();
 
     void OnClickSquare();
 
 private:
-    std::vector<Boat> _ourGridBoats;
-    std::vector<EnemyGridShot> _enemyGridShots;
+    std::vector<Boat> _playerGridBoats;//TODO: move to the player class
+    std::vector<GridShot> _playerGridShots;
     bool _gameOver;
     int _mouseX;
     int _mouseY;
@@ -67,13 +67,19 @@ private:
     bool _isVertical = false;
 
     //SDL_Rect selectedSquare;
-    SDL_Rect highlightedSquare{0, 0, 39, 39};
+    SDL_Rect _highlightedBoat{0, 0, 39, 39};
 
-    void SaveSelectedSquare();
+    void SaveBoat();
 
-    void SaveEnemySquare();
+    void SaveShot();
 
-    [[nodiscard]] static bool CheckEnemySquareCollision(const SDL_Rect &shot, const std::vector<EnemyGridShot> &enemyFieldShots);
+    [[nodiscard]] static bool CheckEnemySquareCollision(const SDL_Rect &shot, const std::vector<GridShot> &enemyFieldShots);
+
+    [[nodiscard]] static bool IsBoatCollideRect(const Boat &boat, const SDL_Rect &rect);
+
+    [[nodiscard]] static bool IsBoatsCollideRect(const std::vector<Boat> &otherBoats, const SDL_Rect &rect);
+
+    [[nodiscard]] static SDL_Rect CalkShipsPadding(const Boat &boat);
 };
 
 #endif // GAME_H

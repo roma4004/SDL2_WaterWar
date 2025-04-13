@@ -35,8 +35,8 @@ void Application::gameLoop() {
         // Clear "buffer" before every screen generation
         renderer->clear();
 
-        game.drawShipsList(renderer->renderer);
-        game.drawPlayerShotList(renderer->renderer);
+        game.drawPlayerShips(renderer->renderer);
+        game.drawPlayerShots(renderer->renderer);
 
         // Draw highlighted square
         game.drawHighlightedShip(renderer->renderer);

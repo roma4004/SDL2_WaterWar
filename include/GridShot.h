@@ -3,11 +3,11 @@
 
 #include <SDL.h>
 
-class EnemyGridShot {
+class GridShot {
     SDL_Rect _rect{};
 
 public:
-    explicit EnemyGridShot(SDL_Rect rect);
+    explicit GridShot(SDL_Rect rect);
 
     [[nodiscard]] SDL_Rect getRect() const;
 
