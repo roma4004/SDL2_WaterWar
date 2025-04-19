@@ -109,14 +109,14 @@ bool Game::IsCollide(const SDL_Rect &rect1, const SDL_Rect &rect2) {
     return true;
 }
 
-bool Game::CheckEnemySquareCollision(const SDL_Rect &newShot, const std::vector<GridShot> &enemyFieldShots) {
+bool Game::CheckEnemyShotsCollision(const SDL_Rect &newShot, const std::vector<GridShot> &enemyFieldShots) {
     return std::none_of(enemyFieldShots.begin(), enemyFieldShots.end(), [&newShot](const GridShot &shot) {
         const auto &oldShot = shot.getRect();
         return newShot.x == oldShot.x && newShot.y == oldShot.y;
     });
 }
 
-bool Game::IsBoatsCollidePaddingRect(const Boat &boat, const std::vector<Boat> &otherBoats) {
+bool Game::IsPaddingCollideBoats(const Boat &boat, const std::vector<Boat> &otherBoats) {
     const auto paddingRect = CalkShipsPadding(boat);
     if (IsBoatsCollideRect(otherBoats, paddingRect)) {
         return true;
@@ -157,18 +157,24 @@ bool Game::IsBoatCollideOtherBoats(const Boat &newBoat, const std::vector<Boat> 
     return false;
 }
 
-bool Game::IsShipLimitReached() {
+bool Game::IsShipLimitReached(bool isPlayerOne) { //TODO: rename boat to ship
     const int shipSizeToIndex = getShipSize() - 1;
-    if (_placedShipCount[shipSizeToIndex] < _placedShipCountLimit[shipSizeToIndex]) {
-        return false;
+    if (isPlayerOne) {
+        if (_placedPlayerOneShipCount[shipSizeToIndex] < _placedPlayerOneShipCountLimit[shipSizeToIndex]) {
+            return false;
+        }
+    } else {
+        if (_placedPlayerTwoShipCount[shipSizeToIndex] < _placedPlayerTwoShipCountLimit[shipSizeToIndex]) {
+            return false;
+        }
     }
 
     return true;
 }
 
 void Game::OnClickSquare() {
-    if (_mouseX <= _tableSize * _gridSize) {
-        SaveBoat();
+    if (_mouseX < _tableSize * _gridSize) {
+        SaveShip();
         cout << "OnClick our: " << endl;
     } else {
         SaveShot();
@@ -176,24 +182,31 @@ void Game::OnClickSquare() {
     }
 }
 
-void Game::SaveBoat() {
+void Game::SaveShip() {
     // confirm validation
     if (_indexX >= _tableSize
-        || _indexY >= _tableSize) {
+        || (_indexY >= _tableSize && _indexY < _tableSize + 2)
+        || _indexY >= _tableSize * 2 + 2) {
         return;
     }
 
     Boat newBoat = Boat(_highlightedBoat, getShipSize(), getIsVertical());
 
-    if (IsBoatCollideOtherBoats(newBoat, _playerGridBoats)
-        || IsBoatsCollidePaddingRect(newBoat, _playerGridBoats)
-        || IsShipLimitReached()) {
+    const bool isPlayerOne = _indexY < _tableSize;
+    if (IsBoatCollideOtherBoats(newBoat, isPlayerOne ? _playerOneGridBoats : _playerTwoGridBoats)
+        || IsPaddingCollideBoats(newBoat, isPlayerOne ? _playerOneGridBoats : _playerTwoGridBoats)
+        || IsShipLimitReached(isPlayerOne)) {
         return;
     }
 
     const int shipSizeToIndex = getShipSize() - 1;
-    ++_placedShipCount[shipSizeToIndex];
-    _playerGridBoats.emplace_back(newBoat);
+    if (isPlayerOne) {
+        ++_placedPlayerOneShipCount[shipSizeToIndex];
+        _playerOneGridBoats.emplace_back(newBoat);
+    } else {
+        ++_placedPlayerTwoShipCount[shipSizeToIndex];
+        _playerTwoGridBoats.emplace_back(newBoat);
+    }
 }
 
 void Game::SaveShot() {
@@ -210,8 +223,12 @@ void Game::SaveShot() {
     cout << "SaveShot x: " << x << endl;
     cout << "SaveShot y: " << y << endl;
     const SDL_Rect enemySquare = SDL_Rect{x * _gridSize, y * _gridSize, _gridSize, _gridSize};
-    if (CheckEnemySquareCollision(enemySquare, _playerGridShots)) {
-        _playerGridShots.emplace_back(enemySquare);
+    if (CheckEnemyShotsCollision(enemySquare, _playerOneGridShots)) {
+        if (y >= _tableSize + gridPadding) {
+            _playerTwoGridShots.emplace_back(enemySquare);
+        } else {
+            _playerOneGridShots.emplace_back(enemySquare);
+        }
     }
 }
 
@@ -226,22 +243,37 @@ SDL_Rect Game::CalkShipsPadding(const Boat &boat) {
             paddingHead.x, paddingHead.y, paddingTail.x - paddingHead.x, paddingTail.y - paddingHead.y};
 }
 
-void Game::drawPlayerShips(SDL_Renderer *renderer) {
-    for (const auto &boat: _playerGridBoats) {
-
-        if (!(_indexX >= _tableSize || _indexY >= _tableSize)) {
-
+void Game::drawPlayersShips(SDL_Renderer *renderer) {
+    //Draw player one ships
+    for (const auto &boat: _playerOneGridBoats) {
+        //draw ship padding
+        if (_indexX < _tableSize && _indexY < _tableSize) {
             //count ship padding
             auto paddingRect = CalkShipsPadding(boat);
+            paddingRect = CutOutsideGridPlayerOne(paddingRect);
 
-            if (paddingRect.x + paddingRect.w > _tableSize * _gridSize) {
-                paddingRect.w -= _gridSize; //cut width if outside grid
-            }
-            if (paddingRect.y + paddingRect.h > _tableSize * _gridSize) {
-                paddingRect.h -= _gridSize; //cut height if outside grid
-            }
+            SDL_SetRenderDrawColor(renderer, 70, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &paddingRect);
+        }
 
-            //draw ship padding
+        //draw ship
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //TODO: create enum pallet for colors
+        for (const auto &boatPart: boat.body) {
+            const auto rect = boatPart.getRect();
+            SDL_RenderFillRect(renderer, &rect);
+        }
+    }
+
+    //Draw player two ships
+    for (const auto &boat: _playerTwoGridBoats) {
+        //draw ship padding
+        if (_indexX < _tableSize
+            && _indexY >= _tableSize + 2
+            && _indexY < _tableSize * 2 + 2) {
+
+            auto paddingRect = CalkShipsPadding(boat);
+            paddingRect = CutOutsideGripPlayerTwo(paddingRect);
+
             SDL_SetRenderDrawColor(renderer, 70, 0, 0, 255);
             SDL_RenderFillRect(renderer, &paddingRect);
         }
@@ -255,8 +287,49 @@ void Game::drawPlayerShips(SDL_Renderer *renderer) {
     }
 }
 
+SDL_Rect &Game::CutOutsideGridPlayerOne(SDL_Rect &paddingRect) const {
+    if (paddingRect.x + paddingRect.w > _tableSize * _gridSize) {
+        paddingRect.w -= _gridSize; //cut width outside the grid
+    }
+    if (paddingRect.y + paddingRect.h > _tableSize * _gridSize) {
+        paddingRect.h -= _gridSize; //cut height outside the grid
+    }
+    return paddingRect;
+}
+
+SDL_Rect &Game::CutOutsideGripPlayerTwo(SDL_Rect &paddingRect) const {
+    //cut top padding if outside the grid by x
+    //if (paddingRect.x < 0) {
+    //    paddingRect.x += _gridSize; //cut width of outside grid
+    //}
+
+    //cut left padding if outside the grid by y
+    if (paddingRect.y < (_tableSize + 2) * _gridSize) {
+        paddingRect.y += _gridSize + 1; //cut height if outside the grid
+        paddingRect.h -= _gridSize; //cut height if outside the grid
+    }
+
+    //cut right padding if outside the grid by x
+    if (paddingRect.x + paddingRect.w > _tableSize * _gridSize) {
+        paddingRect.w -= _gridSize; //cut width of outside grid
+    }
+
+    //cut bottom padding if outside the grid by y
+    if (paddingRect.y + paddingRect.h > (_tableSize * 2 + 2) * _gridSize) {
+        paddingRect.h -= _gridSize; //cut height if outside the grid
+    }
+
+    return paddingRect;
+}
+
 void Game::drawPlayerShots(SDL_Renderer *renderer) {
-    for (const auto &enemyFieldShot: _playerGridShots) {
+    for (const auto &enemyFieldShot: _playerOneGridShots) {
+        const SDL_Rect rect = enemyFieldShot.getRect();
+        SDL_SetRenderDrawColor(renderer, 0xFF, 45, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+
+    for (const auto &enemyFieldShot: _playerTwoGridShots) {
         const SDL_Rect rect = enemyFieldShot.getRect();
         SDL_SetRenderDrawColor(renderer, 0xFF, 45, 0, 255);
         SDL_RenderFillRect(renderer, &rect);
@@ -273,13 +346,15 @@ void Game::drawHighlightedShip(SDL_Renderer *renderer) {
         return;
     }
 
-    _highlightedBoat.x = x * _gridSize + 1;
+    _highlightedBoat.x = x * _gridSize + 1;//TODO: extract setting from drawing logic
     _highlightedBoat.y = y * _gridSize + 1;
 
     Boat newBoat = Boat(_highlightedBoat, getShipSize(), getIsVertical());
-    if (IsBoatCollideOtherBoats(newBoat, _playerGridBoats)
-        || IsBoatsCollidePaddingRect(newBoat, _playerGridBoats)
-        || IsShipLimitReached()) {
+    const bool isPlayerOne = y < _tableSize;
+    vector<Boat> &otherBoats = isPlayerOne ? _playerOneGridBoats : _playerTwoGridBoats;
+    if (IsBoatCollideOtherBoats(newBoat, otherBoats)
+        || IsPaddingCollideBoats(newBoat, otherBoats)
+        || IsShipLimitReached(y < _tableSize)) {
         SDL_SetRenderDrawColor(renderer, 127, 0, 0, 255);
     } else {
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
@@ -305,7 +380,7 @@ void Game::drawHighlightedShip(SDL_Renderer *renderer) {
     }
 }
 
-void Game::render(SDL_Renderer *renderer) {}
+void Game::render([[maybe_unused]] SDL_Renderer *renderer) {}
 
 void Game::setIsVertical(bool isVertical) { _isVertical = isVertical; }
 

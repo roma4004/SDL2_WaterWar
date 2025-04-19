@@ -10,7 +10,7 @@ Application::Application() = default;
 bool Application::init() {
     this->renderer = new Renderer();
 
-    // Will initialize window and renderer SDL on init() action
+    // Will initialize the window and renderer SDL on init() action
     if (renderer->init()) {
         game.init();
 
@@ -35,10 +35,9 @@ void Application::gameLoop() {
         // Clear "buffer" before every screen generation
         renderer->clear();
 
-        game.drawPlayerShips(renderer->renderer);
+        game.drawPlayersShips(renderer->renderer);
         game.drawPlayerShots(renderer->renderer);
 
-        // Draw highlighted square
         game.drawHighlightedShip(renderer->renderer);
 
         playerShipFild->draw(renderer->renderer);
