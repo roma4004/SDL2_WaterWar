@@ -13,6 +13,8 @@ public:
     [[nodiscard]] SDL_Rect getRect() const;
 
     void setRect(const SDL_Rect &newRect);
+
+    int _color{0x0000ff}; //TODO: move to private and add getter and setter
 };
 
 class Boat {

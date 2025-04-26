@@ -45,7 +45,7 @@ public:
 
     [[nodiscard]] static bool IsBoatCollideOtherBoats(const Boat &newBoat, const std::vector<Boat> &otherBoats);
 
-    [[nodiscard]] static bool IsPaddingCollideBoats(const Boat &boat, const std::vector<Boat> &otherBoats) ;
+    [[nodiscard]] static bool IsPaddingCollideBoats(const Boat &boat, const std::vector<Boat> &otherBoats);
 
     [[nodiscard]] bool IsShipLimitReached(bool isPlayerOne);
 
@@ -79,17 +79,26 @@ private:
 
     void SaveShot();
 
-    [[nodiscard]] static bool CheckEnemyShotsCollision(const SDL_Rect &newShot, const std::vector<GridShot> &enemyFieldShots);
+    [[nodiscard]] static bool
+    CheckEnemyShotsCollision(const SDL_Rect &newShot, const std::vector<GridShot> &enemyFieldShots);
 
     [[nodiscard]] static bool IsBoatCollideRect(const Boat &boat, const SDL_Rect &rect);
 
     [[nodiscard]] static bool IsBoatsCollideRect(const std::vector<Boat> &otherBoats, const SDL_Rect &rect);
 
-    [[nodiscard]] static SDL_Rect CalkShipsPadding(const Boat &boat);
+    [[nodiscard]] static Boat *ShotCollideOtherBoats(const SDL_Rect &rect, std::vector<Boat> &otherBoats);
+
+    [[nodiscard]] static SDL_Rect GetShipsPadding(const Boat &boat);
 
     [[nodiscard]] SDL_Rect &CutOutsideGridPlayerOne(SDL_Rect &paddingRect) const;
 
-    [[nodiscard]] SDL_Rect &CutOutsideGripPlayerTwo(SDL_Rect &paddingRect) const;
+    [[nodiscard]] SDL_Rect &CutOutsideGridPlayerTwo(SDL_Rect &paddingRect) const;
+
+    [[nodiscard]] static bool IsAllShipPartDamaged(const Boat *damagedBoat);
+
+    [[nodiscard]] SDL_Rect &CutShotOutsideGridPlayerOne(SDL_Rect &paddingRect) const;
+
+    [[nodiscard]] SDL_Rect &CutShotOutsideGridPlayerTwo(SDL_Rect &paddingRect) const;
 };
 
 #endif // GAME_H

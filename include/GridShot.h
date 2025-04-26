@@ -7,7 +7,11 @@ class GridShot {
     SDL_Rect _rect{};
 
 public:
+    int _color{0x700000}; //TODO: move to private and add getter and setter
+
     explicit GridShot(SDL_Rect rect);
+
+    GridShot(SDL_Rect rect, int color);
 
     [[nodiscard]] SDL_Rect getRect() const;
 
