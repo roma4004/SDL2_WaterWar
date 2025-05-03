@@ -228,6 +228,66 @@ bool Game::IsAllShipPartDamaged(const Boat *damagedBoat) {
                        [](const auto &part) { return part._color == 0xffff00; });
 }
 
+SDL_Rect Game::GetShotPadding(bool isPlayerOne, Boat *damagedBoat) {
+    SDL_Rect shipPadding = GetShipsPadding(*damagedBoat);
+    shipPadding = MapFromShipGridToShotGrid(isPlayerOne, shipPadding);
+    shipPadding = CutShotOutsideGridPlayer(isPlayerOne, shipPadding);
+    //cout << "shipPadding.x y" << shipPadding.x << " " << shipPadding.y << endl; //deal damage
+
+    return shipPadding;
+}
+
+bool Game::MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, vector<Boat> &playerBoats,
+                    vector<GridShot> &playerShots, bool isPlayerOne) {  //NOTE: player two shots
+    if (auto damagedBoat = ShotCollideOtherBoats(damageRect, playerBoats); damagedBoat != nullptr) {
+        if (IsAllShipPartDamaged(damagedBoat)) {
+            playerShots.emplace_back(GetShotPadding(isPlayerOne, damagedBoat));
+            playerShots.emplace_back(shotRect, 0xffff00);
+            cout << "kill" << endl; //deal damage
+
+            return true;
+        } else {
+            playerShots.emplace_back(shotRect, 0xffff00);
+            cout << "hit" << endl; //deal damage
+
+            return true;
+        }
+    } else {
+        playerShots.emplace_back(shotRect);
+        cout << "miss" << endl;
+    }
+
+    return false;
+}
+
+SDL_Rect Game::MapFromShotGridToShipGrid(bool isPlayerOne, const int x, const int y) {
+    if (isPlayerOne) {
+        return SDL_Rect{(x - _tableSize - 2) * _gridSize,
+                        (y + _tableSize + 2) * _gridSize,
+                        _gridSize,
+                        _gridSize};
+    } else {
+        return SDL_Rect{(x - _tableSize - 2) * _gridSize,
+                        (y - _tableSize - 2) * _gridSize,
+                        _gridSize,
+                        _gridSize};
+    }
+}
+
+SDL_Rect Game::MapFromShipGridToShotGrid(bool isPlayerOne, SDL_Rect shipPadding) const {
+    if (isPlayerOne) {
+        return SDL_Rect{shipPadding.x + (_tableSize + 2) * _gridSize,
+                        shipPadding.y - (_tableSize + 2) * _gridSize,
+                        shipPadding.w,
+                        shipPadding.h};
+    } else {
+        return SDL_Rect{shipPadding.x + (_tableSize + 2) * _gridSize,
+                        shipPadding.y + (_tableSize + 2) * _gridSize,
+                        shipPadding.w,
+                        shipPadding.h};
+    }
+}
+
 void Game::SaveShot() {
     const int x = _indexX;
     const int y = _indexY;
@@ -241,56 +301,27 @@ void Game::SaveShot() {
 
     cout << "SaveShot x: " << x << " y:" << y << endl;
     const SDL_Rect shotRect = SDL_Rect{x * _gridSize, y * _gridSize, _gridSize, _gridSize};
-    if (CheckEnemyShotsCollision(shotRect, _playerOneGridShots)) {
-        if (y >= _tableSize + gridPadding) {
-            //NOTE: player one shots
 
-            const SDL_Rect damageRect = SDL_Rect{(x - _tableSize - 2) * _gridSize, (y - _tableSize - 2) * _gridSize,
-                                                 _gridSize, _gridSize};
-            if (auto damagedBoat = ShotCollideOtherBoats(damageRect, _playerOneGridBoats); damagedBoat != nullptr) {
-                if (IsAllShipPartDamaged(damagedBoat)) {
-                    auto shipPadding = GetShipsPadding(*damagedBoat);
-                    shipPadding = {shipPadding.x + (_tableSize + 2) * _gridSize,
-                                   shipPadding.y + (_tableSize + 2) * _gridSize, shipPadding.w, shipPadding.h};
-                    shipPadding = CutShotOutsideGridPlayerTwo(shipPadding);
-                    _playerTwoGridShots.emplace_back(shipPadding);
-//                    cout << "playerTwo kill playerOne" << endl; //deal damage
-                    _playerTwoGridShots.emplace_back(shotRect, 0xffff00);
+    cout << "shotRect x: " << shotRect.x << " y:" << shotRect.y << endl;
 
-                    return;
-                } else {
-//                    cout << "playerTwo shot playerOne" << endl; //deal damage
-                    _playerTwoGridShots.emplace_back(shotRect, 0xffff00);
+    if (_isPlayerOneTurn) {
+        if (y < _tableSize) {
+            if (CheckEnemyShotsCollision(shotRect, _playerOneGridShots)) {
+                constexpr bool isPlayerOne = true;
+                const SDL_Rect &shipRect = MapFromShotGridToShipGrid(isPlayerOne, _indexX, _indexY);
+                if (!MakeShot(shotRect, shipRect, _playerTwoGridBoats, _playerOneGridShots, isPlayerOne)) {
+                    _isPlayerOneTurn = false;
                 }
-            } else {
-                //cout << "playerTwo miss playerOne" << endl;
-                _playerTwoGridShots.emplace_back(shotRect);
             }
-
-        } else {
-            //NOTE: player two shots
-
-            const SDL_Rect damageRect = SDL_Rect{(x - _tableSize - 2) * _gridSize,
-                                                 (y + _tableSize + 2) * _gridSize, _gridSize, _gridSize};
-            if (auto damagedBoat = ShotCollideOtherBoats(damageRect, _playerTwoGridBoats); damagedBoat != nullptr) {
-                if (IsAllShipPartDamaged(damagedBoat)) {
-                    auto shipPadding = GetShipsPadding(*damagedBoat);
-                    shipPadding = {shipPadding.x + (_tableSize + 2) * _gridSize,
-                                   shipPadding.y - (_tableSize + 2) * _gridSize, shipPadding.w, shipPadding.h};
-                    shipPadding = CutShotOutsideGridPlayerOne(shipPadding);
-                    _playerOneGridShots.emplace_back(shipPadding);
-//                    cout << "shipPadding.x y" << shipPadding.x << " " << shipPadding.y << endl; //deal damage
-//                    cout << "playerOne kill playerTwo" << endl; //deal damage
-
-                    _playerOneGridShots.emplace_back(shotRect, 0xffff00);
-                    return;
-                } else {
-//                    cout << "playerOne shot playerTwo" << endl; //deal damage
-                    _playerOneGridShots.emplace_back(shotRect, 0xffff00);
+        }
+    } else {
+        if (y >= _tableSize + gridPadding && y < _tableSize * 2 + gridPadding) {
+            if (CheckEnemyShotsCollision(shotRect, _playerTwoGridShots)) {
+                constexpr bool isPlayerOne = false;
+                const SDL_Rect &hitShipRect = MapFromShotGridToShipGrid(isPlayerOne, _indexX, _indexY);
+                if (!MakeShot(shotRect, hitShipRect, _playerOneGridBoats, _playerTwoGridShots, isPlayerOne)) {
+                    _isPlayerOneTurn = true;
                 }
-            } else {
-                //cout << "playerOne miss playerTwo" << endl;
-                _playerOneGridShots.emplace_back(shotRect);
             }
         }
     }
@@ -396,41 +427,40 @@ SDL_Rect &Game::CutOutsideGridPlayerTwo(SDL_Rect &paddingRect) const {
     return paddingRect;
 }
 
-SDL_Rect &Game::CutShotOutsideGridPlayerOne(SDL_Rect &paddingRect) const {
-    if (paddingRect.x < (_tableSize + 2) * _gridSize) { //cut left outside the grid
-        paddingRect.x += _gridSize;
-        paddingRect.w -= _gridSize;
-    }
+SDL_Rect &Game::CutShotOutsideGridPlayer(bool isPlayerOne, SDL_Rect &paddingRect) const {
+    if (isPlayerOne) {
+        if (paddingRect.x < (_tableSize + 2) * _gridSize) { //cut left outside the grid
+            paddingRect.x += _gridSize;
+            paddingRect.w -= _gridSize;
+        }
 
-    if (paddingRect.y + paddingRect.h > _tableSize * _gridSize) { //cut bottom outside the grid
-        paddingRect.h -= _gridSize;
-    }
+        if (paddingRect.y + paddingRect.h > _tableSize * _gridSize) { //cut bottom outside the grid
+            paddingRect.h -= _gridSize;
+        }
 
-    if (paddingRect.x + paddingRect.w > (_tableSize * 2 + 2) * _gridSize) { //cut right outside the grid
-        paddingRect.w -= _gridSize;
-    }
-    return paddingRect;
-}
+        if (paddingRect.x + paddingRect.w > (_tableSize * 2 + 2) * _gridSize) { //cut right outside the grid
+            paddingRect.w -= _gridSize;
+        }
+    } else {
+        if (paddingRect.y < (_tableSize + 2) * _gridSize) { //cut top padding outside the grid
+            paddingRect.y += _gridSize;
+            paddingRect.h -= _gridSize;
+        }
 
-SDL_Rect &Game::CutShotOutsideGridPlayerTwo(SDL_Rect &paddingRect) const {
-    if (paddingRect.y < (_tableSize+2) * _gridSize) { //cut top padding outside the grid
-        paddingRect.y += _gridSize;
-        paddingRect.h -= _gridSize;
-    }
+        if (paddingRect.x < (_tableSize + 2) * _gridSize) { //cut left padding outside the grid
+            paddingRect.x += _gridSize;
+            paddingRect.w -= _gridSize;
+        }
 
-    if (paddingRect.x < (_tableSize+2) * _gridSize) { //cut left padding outside the grid
-        paddingRect.x += _gridSize;
-        paddingRect.w -= _gridSize;
-    }
-
-    if (paddingRect.y + paddingRect.h > (_tableSize*2+2) * _gridSize) { //cut bottom padding outside the grid
+        if (paddingRect.y + paddingRect.h > (_tableSize * 2 + 2) * _gridSize) { //cut bottom padding outside the grid
 //        paddingRect.y += _gridSize;
-        paddingRect.h -= _gridSize;
-    }
+            paddingRect.h -= _gridSize;
+        }
 
-    if (paddingRect.x + paddingRect.w > (_tableSize*2+2) * _gridSize) { //cut right padding outside the grid
+        if (paddingRect.x + paddingRect.w > (_tableSize * 2 + 2) * _gridSize) { //cut right padding outside the grid
 //        paddingRect.x += _gridSize;
-        paddingRect.w -= _gridSize;
+            paddingRect.w -= _gridSize;
+        }
     }
 
     return paddingRect;

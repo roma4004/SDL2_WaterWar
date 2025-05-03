@@ -96,8 +96,11 @@ bool Application::handleInput() {
             game.setMouseCoordinates(e.button.x, e.button.y);
             game.setSquareLocation(e.button.x, e.button.y);
         }
+
         if (e.type == SDL_MOUSEBUTTONDOWN) {
-            cout << "Event MOUSE BUTTON DOWN : " << "x: " << e.button.x / 40 << " y: " << e.button.y / 40 << endl;
+            cout << "Event MOUSE BUTTON DOWN : "
+            << "x: " << e.button.x / 40
+            << " y: " << e.button.y / 40 << endl;
             game.OnClickSquare();
         }
     }

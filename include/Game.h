@@ -59,6 +59,8 @@ private:
     std::vector<GridShot> _playerTwoGridShots;
 
     bool _gameOver;
+    bool _isPlayerOneTurn{true};
+
     int _mouseX;
     int _mouseY;
     int _indexX;
@@ -96,9 +98,19 @@ private:
 
     [[nodiscard]] static bool IsAllShipPartDamaged(const Boat *damagedBoat);
 
-    [[nodiscard]] SDL_Rect &CutShotOutsideGridPlayerOne(SDL_Rect &paddingRect) const;
+    [[nodiscard]] SDL_Rect &CutShotOutsideGridPlayer(bool isPlayerOne, SDL_Rect &paddingRect) const;
 
-    [[nodiscard]] SDL_Rect &CutShotOutsideGridPlayerTwo(SDL_Rect &paddingRect) const;
+    [[nodiscard]] bool
+    MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, std::vector <Boat> &playerBoats,
+             std::vector <GridShot> &playerShots, bool isPlayerOne);
+
+//    [[nodiscard]]  bool SaveShotPlayerOne(const SDL_Rect &shotRect);
+
+//    [[nodiscard]] bool SaveShotPlayerTwo(const SDL_Rect &shotRect);
+    [[nodiscard]] SDL_Rect MapFromShotGridToShipGrid(bool isPlayerOne, int x, int y);
+    [[nodiscard]] SDL_Rect MapFromShipGridToShotGrid(bool isPlayerOne, SDL_Rect shipPadding) const;
+
+    [[nodiscard]] SDL_Rect GetShotPadding(bool isPlayerOne, Boat *damagedBoat);
 };
 
 #endif // GAME_H
