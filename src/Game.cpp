@@ -17,7 +17,7 @@ void Game::update() const {
     if (_gameOver) return;
 }
 
-void Game::setRotateAdjust() {
+void Game::SetRotateAdjust() {
     _indexX = _mouseX / _gridSize;
     _indexY = _mouseY / _gridSize;
 
@@ -194,6 +194,27 @@ void Game::OnClickSquare() {
         SaveShot();
         cout << "OnClick enemy: " << endl;
     }
+    SetRotateAdjust();
+}
+
+void Game::OnScrollSquare(const float &preciseY) {
+    if (_mouseX < _tableSize * _gridSize) {
+        scrollShipSize(preciseY);
+        cout << "OnScroll: " << endl;
+        SetRotateAdjust();
+    }
+}
+
+void Game::scrollShipSize(const float &preciseY){
+    int newSize = preciseY > 0 ? _shipSize + 1 : _shipSize - 1;
+    if (newSize <= 4 && newSize > 0) {
+        _shipSize = newSize;
+    }
+}
+
+void::Game::RotateShip(){
+    setIsVertical(!getIsVertical());
+    SetRotateAdjust();
 }
 
 void Game::SaveShip() {
@@ -552,7 +573,10 @@ void Game::render([[maybe_unused]] SDL_Renderer *renderer) {}
 
 void Game::setIsVertical(bool isVertical) { _isVertical = isVertical; }
 
-void Game::setShipSize(int shipSize) { _shipSize = shipSize; }
+void Game::setShipSize(int shipSize) {
+    _shipSize = shipSize;
+    SetRotateAdjust();
+}
 
 bool Game::getIsVertical() const { return _isVertical; }
 

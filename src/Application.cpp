@@ -71,22 +71,18 @@ bool Application::handleInput() {
 
         if (e.type == SDL_KEYDOWN) {
             if (e.key.keysym.scancode == SDL_SCANCODE_R) {
-                game.setIsVertical(!game.getIsVertical());
-                game.setRotateAdjust();
+                game.RotateShip();
             }
 
             if (e.key.keysym.scancode == SDL_SCANCODE_1) {
                 game.setShipSize(1);
-                game.setRotateAdjust();
+
             } else if (e.key.keysym.scancode == SDL_SCANCODE_2) {
                 game.setShipSize(2);
-                game.setRotateAdjust();
             } else if (e.key.keysym.scancode == SDL_SCANCODE_3) {
                 game.setShipSize(3);
-                game.setRotateAdjust();
             } else if (e.key.keysym.scancode == SDL_SCANCODE_4) {
                 game.setShipSize(4);
-                game.setRotateAdjust();
             }
 
             cout << "Event KEY DOWN: " << e.key.keysym.scancode << endl;
@@ -101,7 +97,19 @@ bool Application::handleInput() {
             cout << "Event MOUSE BUTTON DOWN : "
             << "x: " << e.button.x / 40
             << " y: " << e.button.y / 40 << endl;
-            game.OnClickSquare();
+
+            if(e.button.button == SDL_BUTTON_LEFT){
+                game.OnClickSquare();
+            }
+            else if(e.button.button == SDL_BUTTON_RIGHT) {
+                game.RotateShip();
+            }
+        }
+        if (e.type == SDL_MOUSEWHEEL) {
+            cout << "Event MOUSE WHEEL SCROLL : "
+                 << "x: " << e.wheel.preciseX
+                 << " y: " << e.wheel.preciseY << endl;
+            game.OnScrollSquare(e.wheel.preciseY);
         }
     }
 

@@ -60,8 +60,8 @@ target_include_directories(
     SDL2_WaterWar
     PUBLIC
     ${SDL2_INCLUDE_DIRS}
-    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um"
-    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared"
+#    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um"
+#    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared"
     "${CMAKE_SOURCE_DIR}/include"
 )
 
@@ -71,6 +71,6 @@ target_link_libraries(
     PUBLIC
     SDL2::SDL2main
     SDL2::SDL2
-    "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/x64/dinput8.lib"
-    "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/x64/dxguid.lib"
+    #"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/x64/dinput8.lib"
+    #"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/x64/dxguid.lib"
 )

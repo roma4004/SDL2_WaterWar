@@ -39,7 +39,7 @@ public:
 
     void drawPlayerShots(SDL_Renderer *renderer);
 
-    void setRotateAdjust();
+    void SetRotateAdjust();
 
     [[nodiscard]] static bool IsCollide(const SDL_Rect &r1, const SDL_Rect &r2);
 
@@ -50,6 +50,10 @@ public:
     [[nodiscard]] bool IsShipLimitReached(bool isPlayerOne);
 
     void OnClickSquare();
+
+    void OnScrollSquare(const float& preciseY);
+
+    void RotateShip();
 
 private:
     std::vector<Boat> _playerOneGridBoats;//TODO: move to the player class
@@ -111,6 +115,9 @@ private:
     [[nodiscard]] SDL_Rect MapFromShipGridToShotGrid(bool isPlayerOne, SDL_Rect shipPadding) const;
 
     [[nodiscard]] SDL_Rect GetShotPadding(bool isPlayerOne, Boat *damagedBoat);
+    void scrollShipSize(const float &preciseY);
+
+
 };
 
 #endif // GAME_H
