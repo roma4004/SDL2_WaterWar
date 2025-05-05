@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Game::Game() : _gameOver(false), _gameMode(false), _isPlayerOneTurn(true), _mouseX(0), _mouseY(0), _indexX(0), _indexY(0) {}
+Game::Game() = default;
 
 Game::~Game() = default;
 

@@ -67,14 +67,14 @@ private:
 
     std::vector<Boat> _playerTwoGridBoats;
     std::vector<GridShot> _playerTwoGridShots;
-    bool _gameMode; //false - placing , true - shooting
-    bool _gameOver;
-    bool _isPlayerOneTurn;
+    bool _gameMode{false}; //false - placing , true - shooting
+    bool _gameOver{false};
+    bool _isPlayerOneTurn{true};
 
-    int _mouseX;
-    int _mouseY;
-    int _indexX;
-    int _indexY;
+    int _mouseX{0};
+    int _mouseY{0};
+    int _indexX{0};
+    int _indexY{0};
     int _gridSize = 40;
     int _tableSize = 10;
     int _shipSize = 1;
