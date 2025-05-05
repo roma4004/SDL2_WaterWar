@@ -17,7 +17,7 @@ void Game::update() const {
     if (_gameOver) return;
 }
 
-const bool Game::GetGameState() {return _gameState;}
+const bool Game::IsGameStateBattle() {return _gameState;}
 
 const bool Game::IsAllShipsPlaced() {
     for (int i = 0; i < 4; i++) {
@@ -29,7 +29,7 @@ const bool Game::IsAllShipsPlaced() {
     return true;
 };
 
-void Game::ChangeGameState(bool value) {
+void Game::SetGameState(bool value) {
     _gameState = value;
 }
 
@@ -203,14 +203,13 @@ bool Game::IsShipLimitReached(bool isPlayerOne) { //TODO: rename boat to ship
 }
 
 void Game::OnClickSquare() {
-
     if (_mouseX < _tableSize * _gridSize) {
-        if (!GetGameState()) {
+        if (!IsGameStateBattle()) {
             SaveShip();
             cout << "OnClick our: " << endl;
         }
     } else {
-        if (GetGameState()) {
+        if (IsGameStateBattle()) {
             SaveShot();
             cout << "OnClick enemy: " << endl;
         }
@@ -246,7 +245,7 @@ void Game::SaveShip() {
         return;
     }
 
-    Boat newBoat = Boat(_highlightedBoat, getShipSize(), getIsVertical());
+    auto newBoat = Boat(_highlightedBoat, getShipSize(), getIsVertical());
 
     const bool isPlayerOne = _indexY < _tableSize;
     if (IsBoatCollideOtherBoats(newBoat, isPlayerOne ? _playerOneGridBoats : _playerTwoGridBoats)
@@ -259,12 +258,14 @@ void Game::SaveShip() {
     if (isPlayerOne) {
         ++_placedPlayerOneShipCount[shipSizeToIndex];
         _playerOneGridBoats.emplace_back(newBoat);
-    } else {
+    }
+    else {
         ++_placedPlayerTwoShipCount[shipSizeToIndex];
         _playerTwoGridBoats.emplace_back(newBoat);
     }
+
     if (IsAllShipsPlaced()) {
-        ChangeGameState(true);
+        SetGameState(true);
     }
 }
 

@@ -20,7 +20,6 @@ public:
 private:
     bool handleInput();
 
-
     void calculateFPS();
 
     Game game;

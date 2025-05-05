@@ -19,11 +19,11 @@ public:
 
     void update() const;
 
-    const bool GetGameState();
+    const bool IsGameStateBattle();
 
     const bool IsAllShipsPlaced();
 
-    void ChangeGameState(bool value);
+    void SetGameState(bool value);
 
     void render([[maybe_unused]] SDL_Renderer *renderer);
 
@@ -75,14 +75,14 @@ private:
     int _mouseY{0};
     int _indexX{0};
     int _indexY{0};
-    int _gridSize = 40;
-    int _tableSize = 10;
-    int _shipSize = 1;
+    int _gridSize{40};
+    int _tableSize{10};
+    int _shipSize{1};
     int _placedPlayerOneShipCount[4]{0};
     int _placedPlayerOneShipCountLimit[4]{4, 3, 2, 1};
     int _placedPlayerTwoShipCount[4]{0};
     int _placedPlayerTwoShipCountLimit[4]{4, 3, 2, 1};
-    bool _isVertical = false;
+    bool _isVertical{false};
 
     //SDL_Rect selectedSquare;
     SDL_Rect _highlightedBoat{0, 0, 39, 39};
