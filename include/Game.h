@@ -19,11 +19,11 @@ public:
 
     void update() const;
 
-    const bool GetGameMode();
+    const bool GetGameState();
 
     const bool IsAllShipsPlaced();
 
-    void ChangeGameMode();
+    void ChangeGameState(bool value);
 
     void render([[maybe_unused]] SDL_Renderer *renderer);
 
@@ -67,7 +67,7 @@ private:
 
     std::vector<Boat> _playerTwoGridBoats;
     std::vector<GridShot> _playerTwoGridShots;
-    bool _gameMode{false}; //false - placing , true - shooting
+    bool _gameState{false}; //false - placing , true - shooting
     bool _gameOver{false};
     bool _isPlayerOneTurn{true};
 

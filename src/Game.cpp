@@ -17,7 +17,7 @@ void Game::update() const {
     if (_gameOver) return;
 }
 
-const bool Game::GetGameMode() {return _gameMode;}
+const bool Game::GetGameState() {return _gameState;}
 
 const bool Game::IsAllShipsPlaced() {
     for (int i = 0; i < 4; i++) {
@@ -29,13 +29,8 @@ const bool Game::IsAllShipsPlaced() {
     return true;
 };
 
-void Game::ChangeGameMode() {
-    if (IsAllShipsPlaced()) {
-        _gameMode = true;
-    }
-    else {
-        _gameMode = false;
-    }
+void Game::ChangeGameState(bool value) {
+    _gameState = value;
 }
 
 void Game::SetRotateAdjust() {
@@ -210,12 +205,12 @@ bool Game::IsShipLimitReached(bool isPlayerOne) { //TODO: rename boat to ship
 void Game::OnClickSquare() {
 
     if (_mouseX < _tableSize * _gridSize) {
-        if (!GetGameMode()) {
+        if (!GetGameState()) {
             SaveShip();
             cout << "OnClick our: " << endl;
         }
     } else {
-        if (GetGameMode()) {
+        if (GetGameState()) {
             SaveShot();
             cout << "OnClick enemy: " << endl;
         }
@@ -268,7 +263,9 @@ void Game::SaveShip() {
         ++_placedPlayerTwoShipCount[shipSizeToIndex];
         _playerTwoGridBoats.emplace_back(newBoat);
     }
-    ChangeGameMode();
+    if (IsAllShipsPlaced()) {
+        ChangeGameState(true);
+    }
 }
 
 bool Game::IsAllShipPartDamaged(const Boat *damagedBoat) {
