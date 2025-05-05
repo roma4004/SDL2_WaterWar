@@ -19,6 +19,12 @@ public:
 
     void update() const;
 
+    const bool GetGameMode();
+
+    const bool IsAllShipsPlaced();
+
+    void ChangeGameMode();
+
     void render([[maybe_unused]] SDL_Renderer *renderer);
 
     void setMouseCoordinates(int x, int y);
@@ -61,9 +67,9 @@ private:
 
     std::vector<Boat> _playerTwoGridBoats;
     std::vector<GridShot> _playerTwoGridShots;
-
+    bool _gameMode; //false - placing , true - shooting
     bool _gameOver;
-    bool _isPlayerOneTurn{true};
+    bool _isPlayerOneTurn;
 
     int _mouseX;
     int _mouseY;

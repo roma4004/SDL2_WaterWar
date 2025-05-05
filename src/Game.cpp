@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Game::Game() : _gameOver(false), _mouseX(0), _mouseY(0), _indexX(0), _indexY(0) {}
+Game::Game() : _gameOver(false), _gameMode(false), _isPlayerOneTurn(true), _mouseX(0), _mouseY(0), _indexX(0), _indexY(0) {}
 
 Game::~Game() = default;
 
@@ -15,6 +15,27 @@ void Game::init() {}
 
 void Game::update() const {
     if (_gameOver) return;
+}
+
+const bool Game::GetGameMode() {return _gameMode;}
+
+const bool Game::IsAllShipsPlaced() {
+    for (int i = 0; i < 4; i++) {
+        if (_placedPlayerOneShipCount[i] != _placedPlayerOneShipCountLimit[i]
+            || _placedPlayerTwoShipCount[i] != _placedPlayerTwoShipCountLimit[i]) {
+            return false;
+        }
+    }
+    return true;
+};
+
+void Game::ChangeGameMode() {
+    if (IsAllShipsPlaced()) {
+        _gameMode = true;
+    }
+    else {
+        _gameMode = false;
+    }
 }
 
 void Game::SetRotateAdjust() {
@@ -187,12 +208,17 @@ bool Game::IsShipLimitReached(bool isPlayerOne) { //TODO: rename boat to ship
 }
 
 void Game::OnClickSquare() {
+
     if (_mouseX < _tableSize * _gridSize) {
-        SaveShip();
-        cout << "OnClick our: " << endl;
+        if (!GetGameMode()) {
+            SaveShip();
+            cout << "OnClick our: " << endl;
+        }
     } else {
-        SaveShot();
-        cout << "OnClick enemy: " << endl;
+        if (GetGameMode()) {
+            SaveShot();
+            cout << "OnClick enemy: " << endl;
+        }
     }
     SetRotateAdjust();
 }
@@ -242,6 +268,7 @@ void Game::SaveShip() {
         ++_placedPlayerTwoShipCount[shipSizeToIndex];
         _playerTwoGridBoats.emplace_back(newBoat);
     }
+    ChangeGameMode();
 }
 
 bool Game::IsAllShipPartDamaged(const Boat *damagedBoat) {
