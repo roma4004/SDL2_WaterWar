@@ -28,8 +28,8 @@ private:
     const int frameDelay = 1000 / FPS; // Frame delay in milliseconds
 
     Uint32 frameStart{};
-    int frameTime{};
-    int frameCount{};
+    Uint32 frameTime{};
+    Uint32 frameCount{};
     Uint32 lastTime{};
 };
 

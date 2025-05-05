@@ -19,6 +19,12 @@ public:
 
     void update() const;
 
+    const bool IsGameStateBattle();
+
+    const bool IsAllShipsPlaced();
+
+    void SetGameState(bool value);
+
     void render([[maybe_unused]] SDL_Renderer *renderer);
 
     void setMouseCoordinates(int x, int y);
@@ -51,32 +57,32 @@ public:
 
     void OnClickSquare();
 
-    void OnScrollSquare(const float& preciseY);
+    void OnScrollSquare(const float &preciseY);
 
     void RotateShip();
 
 private:
-    std::vector<Boat> _playerOneGridBoats;//TODO: move to the player class
+    std::vector<Boat> _playerOneGridBoats; //TODO: move to the player class
     std::vector<GridShot> _playerOneGridShots;
 
     std::vector<Boat> _playerTwoGridBoats;
     std::vector<GridShot> _playerTwoGridShots;
-
-    bool _gameOver;
+    bool _gameState{false}; //false - placing , true - shooting
+    bool _gameOver{false};
     bool _isPlayerOneTurn{true};
 
-    int _mouseX;
-    int _mouseY;
-    int _indexX;
-    int _indexY;
-    int _gridSize = 40;
-    int _tableSize = 10;
-    int _shipSize = 1;
+    int _mouseX{0};
+    int _mouseY{0};
+    int _indexX{0};
+    int _indexY{0};
+    int _gridSize{40};
+    int _tableSize{10};
+    int _shipSize{1};
     int _placedPlayerOneShipCount[4]{0};
     int _placedPlayerOneShipCountLimit[4]{4, 3, 2, 1};
     int _placedPlayerTwoShipCount[4]{0};
     int _placedPlayerTwoShipCountLimit[4]{4, 3, 2, 1};
-    bool _isVertical = false;
+    bool _isVertical{false};
 
     //SDL_Rect selectedSquare;
     SDL_Rect _highlightedBoat{0, 0, 39, 39};
@@ -105,19 +111,19 @@ private:
     [[nodiscard]] SDL_Rect &CutShotOutsideGridPlayer(bool isPlayerOne, SDL_Rect &paddingRect) const;
 
     [[nodiscard]] bool
-    MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, std::vector <Boat> &playerBoats,
-             std::vector <GridShot> &playerShots, bool isPlayerOne);
+    MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, std::vector<Boat> &playerBoats,
+             std::vector<GridShot> &playerShots, bool isPlayerOne);
 
-//    [[nodiscard]]  bool SaveShotPlayerOne(const SDL_Rect &shotRect);
+    //    [[nodiscard]]  bool SaveShotPlayerOne(const SDL_Rect &shotRect);
 
-//    [[nodiscard]] bool SaveShotPlayerTwo(const SDL_Rect &shotRect);
+    //    [[nodiscard]] bool SaveShotPlayerTwo(const SDL_Rect &shotRect);
     [[nodiscard]] SDL_Rect MapFromShotGridToShipGrid(bool isPlayerOne, int x, int y);
+
     [[nodiscard]] SDL_Rect MapFromShipGridToShotGrid(bool isPlayerOne, SDL_Rect shipPadding) const;
 
     [[nodiscard]] SDL_Rect GetShotPadding(bool isPlayerOne, Boat *damagedBoat);
+
     void scrollShipSize(const float &preciseY);
-
-
 };
 
 #endif // GAME_H
