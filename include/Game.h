@@ -57,12 +57,12 @@ public:
 
     void OnClickSquare();
 
-    void OnScrollSquare(const float& preciseY);
+    void OnScrollSquare(const float &preciseY);
 
     void RotateShip();
 
 private:
-    std::vector<Boat> _playerOneGridBoats;//TODO: move to the player class
+    std::vector<Boat> _playerOneGridBoats; //TODO: move to the player class
     std::vector<GridShot> _playerOneGridShots;
 
     std::vector<Boat> _playerTwoGridBoats;
@@ -111,19 +111,19 @@ private:
     [[nodiscard]] SDL_Rect &CutShotOutsideGridPlayer(bool isPlayerOne, SDL_Rect &paddingRect) const;
 
     [[nodiscard]] bool
-    MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, std::vector <Boat> &playerBoats,
-             std::vector <GridShot> &playerShots, bool isPlayerOne);
+    MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, std::vector<Boat> &playerBoats,
+             std::vector<GridShot> &playerShots, bool isPlayerOne);
 
-//    [[nodiscard]]  bool SaveShotPlayerOne(const SDL_Rect &shotRect);
+    //    [[nodiscard]]  bool SaveShotPlayerOne(const SDL_Rect &shotRect);
 
-//    [[nodiscard]] bool SaveShotPlayerTwo(const SDL_Rect &shotRect);
+    //    [[nodiscard]] bool SaveShotPlayerTwo(const SDL_Rect &shotRect);
     [[nodiscard]] SDL_Rect MapFromShotGridToShipGrid(bool isPlayerOne, int x, int y);
+
     [[nodiscard]] SDL_Rect MapFromShipGridToShotGrid(bool isPlayerOne, SDL_Rect shipPadding) const;
 
     [[nodiscard]] SDL_Rect GetShotPadding(bool isPlayerOne, Boat *damagedBoat);
+
     void scrollShipSize(const float &preciseY);
-
-
 };
 
 #endif // GAME_H
