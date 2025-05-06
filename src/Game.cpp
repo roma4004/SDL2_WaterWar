@@ -14,13 +14,22 @@ Game::~Game() = default;
 void Game::init() {
 }
 
-void Game::update() const {
-    if (_gameOver) return;
+bool Game::GetIsGameOver() const {
+    return _gameOver;
 }
 
-const bool Game::IsGameStateBattle() { return _gameState; }
+bool Game::CheckIsGameOver(){
+    return IsGameStateBattle() &&
+           (IsAllShipsDead(_playerOneGridBoats) or IsAllShipsDead(_playerTwoGridBoats));
+}
 
-const bool Game::IsAllShipsPlaced() {
+void Game::update(){
+    _gameOver = CheckIsGameOver();
+}
+
+bool Game::IsGameStateBattle() const { return _gameState; }
+
+bool Game::IsAllShipsPlaced() const {
     for (int i = 0; i < 4; i++) {
         if (_placedPlayerOneShipCount[i] != _placedPlayerOneShipCountLimit[i]
             || _placedPlayerTwoShipCount[i] != _placedPlayerTwoShipCountLimit[i]) {
@@ -29,6 +38,10 @@ const bool Game::IsAllShipsPlaced() {
     }
     return true;
 };
+
+bool Game::IsAllShipsDead(const std::vector<Boat> &playersBoats) const {
+    return !std::any_of(playersBoats.begin(), playersBoats.end(), [](const Boat& boat) { return !boat.GetIsDead();});;
+}
 
 void Game::SetGameState(bool value) {
     _gameState = value;
@@ -182,7 +195,8 @@ Boat *Game::ShotCollideOtherBoats(const SDL_Rect &rect, std::vector<Boat> &other
     for (auto &boat: otherBoats) {
         for (auto &boatPart: boat.body) {
             if (IsCollide(rect, boatPart.getRect())) {
-                boatPart._color = 0xffff00;
+                boatPart.SetColor(0xffff00);
+                boatPart.SetIsDead(true);
 
                 return &boat;
             }
@@ -276,7 +290,7 @@ void Game::SaveShip() {
 
 bool Game::IsAllShipPartDamaged(const Boat *damagedBoat) {
     return std::all_of(damagedBoat->body.begin(), damagedBoat->body.end(),
-                       [](const auto &part) { return part._color == 0xffff00; });
+                       [](const auto &part) { return part.IsDead(); });
 }
 
 SDL_Rect Game::GetShotPadding(bool isPlayerOne, Boat *damagedBoat) {
@@ -293,13 +307,14 @@ bool Game::MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, vector
     //NOTE: player two shots
     if (auto damagedBoat = ShotCollideOtherBoats(damageRect, playerBoats); damagedBoat != nullptr) {
         if (IsAllShipPartDamaged(damagedBoat)) {
+            damagedBoat->SetIsDead(true);
             playerShots.emplace_back(GetShotPadding(isPlayerOne, damagedBoat));
-            playerShots.emplace_back(shotRect, 0xffff00);
+            playerShots.emplace_back(shotRect, 0xffff00,true);
             cout << "kill" << endl; //deal damage
 
             return true;
         } else {
-            playerShots.emplace_back(shotRect, 0xffff00);
+            playerShots.emplace_back(shotRect, 0xffff00, true);
             cout << "hit" << endl; //deal damage
 
             return true;
@@ -416,7 +431,7 @@ void Game::drawPlayersShips(SDL_Renderer *renderer) {
         //draw ship
         for (const auto &boatPart: boat.body) {
             const auto rect = boatPart.getRect();
-            if (boatPart._color == 0x0000ff) {
+            if (boatPart.GetColor() == 0x0000ff) {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //TODO: create enum pallet for colors
             } else {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
@@ -443,7 +458,7 @@ void Game::drawPlayersShips(SDL_Renderer *renderer) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //TODO: create enum pallet for colors
         for (const auto &boatPart: boat.body) {
             const auto rect = boatPart.getRect();
-            if (boatPart._color == 0x0000ff) {
+            if (boatPart.GetColor() == 0x0000ff) {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //TODO: create enum pallet for colors
             } else {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
@@ -538,7 +553,7 @@ void Game::drawPlayerShots(SDL_Renderer *renderer) {
     for (const auto &enemyFieldShot: _playerOneGridShots) {
         const SDL_Rect rect = enemyFieldShot.getRect();
 
-        if (enemyFieldShot._color == 0x700000) {
+        if (enemyFieldShot.GetColor() == 0x700000) {
             //Draw padding
             SDL_SetRenderDrawColor(renderer, 0x70, 0, 0, 255);
             SDL_RenderFillRect(renderer, &rect);
@@ -548,7 +563,7 @@ void Game::drawPlayerShots(SDL_Renderer *renderer) {
     for (const auto &enemyFieldShot: _playerOneGridShots) {
         const SDL_Rect rect = enemyFieldShot.getRect();
 
-        if (enemyFieldShot._color == 0xffff00) {
+        if (enemyFieldShot.GetColor() == 0xffff00) {
             //Draw ships
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0, 255);
             SDL_RenderFillRect(renderer, &rect);
@@ -558,7 +573,7 @@ void Game::drawPlayerShots(SDL_Renderer *renderer) {
     for (const auto &enemyFieldShot: _playerTwoGridShots) {
         const SDL_Rect rect = enemyFieldShot.getRect();
 
-        if (enemyFieldShot._color == 0x700000) {
+        if (enemyFieldShot.GetColor() == 0x700000) {
             //Draw padding
             SDL_SetRenderDrawColor(renderer, 0x70, 0, 0, 255);
             SDL_RenderFillRect(renderer, &rect);
@@ -568,7 +583,7 @@ void Game::drawPlayerShots(SDL_Renderer *renderer) {
     for (const auto &enemyFieldShot: _playerTwoGridShots) {
         const SDL_Rect rect = enemyFieldShot.getRect();
 
-        if (enemyFieldShot._color == 0xffff00) {
+        if (enemyFieldShot.GetColor() == 0xffff00) {
             //Draw ships
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0, 255);
             SDL_RenderFillRect(renderer, &rect);

@@ -6,7 +6,8 @@
 
 class BoatPart {
     SDL_Rect _rect{};
-
+    int _color{0x0000ff};
+    bool _isDead{false};
 public:
     explicit BoatPart(SDL_Rect rect);
 
@@ -14,12 +15,16 @@ public:
 
     void setRect(const SDL_Rect &newRect);
 
-    int _color{0x0000ff}; //TODO: move to private and add getter and setter
+    [[nodiscard]] int GetColor() const;
+    void SetColor (const int &color);
+
+    [[nodiscard]] bool IsDead() const;
+    void SetIsDead(const bool &boat);
 };
 
 class Boat {
     int _size;
-
+    bool _isDead{false};
 public:
     std::list<BoatPart> body;
 
@@ -32,6 +37,10 @@ public:
     [[nodiscard]] int getSize() const;
 
     void setSize(int size);
+
+    [[nodiscard]] bool CheckIsDead() const;
+    [[nodiscard]] bool GetIsDead() const;
+    void SetIsDead(const bool &boat);
 };
 
 

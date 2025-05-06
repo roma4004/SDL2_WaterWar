@@ -17,11 +17,17 @@ public:
 
     void init();
 
-    void update() const;
+    bool GetIsGameOver() const;
 
-    const bool IsGameStateBattle();
+    bool CheckIsGameOver();
 
-    const bool IsAllShipsPlaced();
+    void update();
+
+    bool IsGameStateBattle() const;
+
+    bool IsAllShipsPlaced() const;
+
+    bool IsAllShipsDead(const std::vector<Boat> &playersBoats) const;
 
     void SetGameState(bool value);
 

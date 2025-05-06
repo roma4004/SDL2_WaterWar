@@ -5,17 +5,23 @@
 
 class GridShot {
     SDL_Rect _rect{};
-
+    int _color{0x700000};
+    bool _isBoat{false};
 public:
-    int _color{0x700000}; //TODO: move to private and add getter and setter
 
+    [[nodiscard]] int GetColor() const;
+    void SetColor (const int &color);
     explicit GridShot(SDL_Rect rect);
 
-    GridShot(SDL_Rect rect, int color);
+    GridShot(SDL_Rect rect, int color,const bool &isBoat);
 
     [[nodiscard]] SDL_Rect getRect() const;
 
     void setRect(const SDL_Rect &newRect);
+
+    [[nodiscard]] bool IsBoat() const;
+    void SetBoat(const bool &boat);
+
 };
 
 #endif //ENEMY_FIELD_SHOT_H
