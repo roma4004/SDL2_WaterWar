@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <Boat.h>
 
 Boat::Boat(SDL_Rect rect) {
@@ -15,6 +16,22 @@ void BoatPart::setRect(const SDL_Rect &newRect) {
     _rect = newRect;
 }
 
+int BoatPart::GetColor() const {
+    return _color;
+}
+
+void BoatPart::SetColor(const int &color) {
+    _color = color;
+}
+
+bool BoatPart::IsDead() const {
+    return _isDead;
+}
+
+void BoatPart::SetIsDead(const bool &boat) {
+    _isDead = boat;
+}
+
 Boat::Boat(SDL_Rect rect, int size, bool isVertical) : _size{size} {
     for (int i = 0; i < size; i++) {
         if (isVertical) {
@@ -28,3 +45,15 @@ Boat::Boat(SDL_Rect rect, int size, bool isVertical) : _size{size} {
 int Boat::getSize() const { return _size; }
 
 void Boat::setSize(int size) { _size = size; }
+
+bool Boat::CheckIsDead() const {
+    return std::all_of(body.begin(), body.end(), [](const BoatPart &boat) {return boat.IsDead();});
+}
+
+bool Boat::GetIsDead() const {
+    return _isDead;
+}
+
+void Boat::SetIsDead(const bool &boat) {
+    _isDead = boat;
+}
