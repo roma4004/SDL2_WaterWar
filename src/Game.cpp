@@ -171,7 +171,7 @@ bool Game::IsBoatsCollideRect(const std::vector<Boat> &otherBoats, const SDL_Rec
 
 bool Game::IsBoatCollideRect(const Boat &boat, const SDL_Rect &rect) {
     for (const auto &boatPart: boat.body) {
-        if (IsCollide(rect, boatPart.getRect())) {
+        if (IsCollide(rect, boatPart.GetRect())) {
             return true;
         }
     }
@@ -182,7 +182,7 @@ bool Game::IsBoatCollideRect(const Boat &boat, const SDL_Rect &rect) {
 
 bool Game::IsBoatCollideOtherBoats(const Boat &newBoat, const std::vector<Boat> &otherBoats) {
     for (const auto &newBoatPart: newBoat.body) {
-        const auto rect = newBoatPart.getRect();
+        const auto rect = newBoatPart.GetRect();
         if (IsBoatsCollideRect(otherBoats, rect)) {
             return true;
         }
@@ -194,7 +194,7 @@ bool Game::IsBoatCollideOtherBoats(const Boat &newBoat, const std::vector<Boat> 
 Boat *Game::ShotCollideOtherBoats(const SDL_Rect &rect, std::vector<Boat> &otherBoats) {
     for (auto &boat: otherBoats) {
         for (auto &boatPart: boat.body) {
-            if (IsCollide(rect, boatPart.getRect())) {
+            if (IsCollide(rect, boatPart.GetRect())) {
                 boatPart.SetColor(0xffff00);
                 boatPart.SetIsDead(true);
 
@@ -404,10 +404,10 @@ void Game::SaveShot() {
 }
 
 SDL_Rect Game::GetShipsPadding(const Boat &boat) {
-    const auto head = (boat.body.begin())->getRect();
+    const auto head = (boat.body.begin())->GetRect();
     const auto paddingHead = SDL_Rect{head.x - head.w - 1, head.y - head.h - 1};
 
-    const auto tail = (--boat.body.end())->getRect();
+    const auto tail = (--boat.body.end())->GetRect();
     const int shipSize = (tail.w + 1) * 2 - 1;
     const auto paddingTail = SDL_Rect{tail.x + shipSize, tail.y + shipSize};
     return SDL_Rect{
@@ -430,7 +430,7 @@ void Game::drawPlayersShips(SDL_Renderer *renderer) {
 
         //draw ship
         for (const auto &boatPart: boat.body) {
-            const auto rect = boatPart.getRect();
+            const auto rect = boatPart.GetRect();
             if (boatPart.GetColor() == 0x0000ff) {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //TODO: create enum pallet for colors
             } else {
@@ -457,7 +457,7 @@ void Game::drawPlayersShips(SDL_Renderer *renderer) {
         //draw ship
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //TODO: create enum pallet for colors
         for (const auto &boatPart: boat.body) {
-            const auto rect = boatPart.getRect();
+            const auto rect = boatPart.GetRect();
             if (boatPart.GetColor() == 0x0000ff) {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); //TODO: create enum pallet for colors
             } else {
