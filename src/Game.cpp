@@ -24,7 +24,6 @@ bool Game::CheckIsGameOver() {
 }
 
 void Game::update() {
-    _gameOver = CheckIsGameOver();
 }
 
 bool Game::IsGameStateBattle() const { return _gameState; }
@@ -401,6 +400,7 @@ void Game::SaveShot() {
             }
         }
     }
+    _gameOver = CheckIsGameOver();
 }
 
 SDL_Rect Game::GetShipsPadding(const Boat &boat) {
