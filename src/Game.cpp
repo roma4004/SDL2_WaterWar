@@ -40,7 +40,7 @@ bool Game::IsAllShipsPlaced() const {
 };
 
 bool Game::IsAllShipsDead(const std::vector<Boat> &playersBoats) const {
-    return !std::any_of(playersBoats.begin(), playersBoats.end(), [](const Boat& boat) { return !boat.GetIsDead();});;
+    return !std::any_of(playersBoats.begin(), playersBoats.end(), [](const Boat& boat) { return !boat.IsDead();});;
 }
 
 void Game::SetGameState(bool value) {
@@ -307,7 +307,7 @@ bool Game::MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, vector
     //NOTE: player two shots
     if (auto damagedBoat = ShotCollideOtherBoats(damageRect, playerBoats); damagedBoat != nullptr) {
         if (IsAllShipPartDamaged(damagedBoat)) {
-            damagedBoat->SetIsDead(true);
+            damagedBoat->SetIsDead(TODO);
             playerShots.emplace_back(GetShotPadding(isPlayerOne, damagedBoat));
             playerShots.emplace_back(shotRect, 0xffff00,true);
             cout << "kill" << endl; //deal damage

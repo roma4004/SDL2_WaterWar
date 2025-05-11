@@ -19,7 +19,7 @@ public:
     void SetColor (const int &color);
 
     [[nodiscard]] bool IsDead() const;
-    void SetIsDead(const bool &boat);
+    void SetIsDead(const bool boat);
 };
 
 class Boat {
@@ -39,8 +39,8 @@ public:
     void setSize(int size);
 
     [[nodiscard]] bool CheckIsDead() const;
-    [[nodiscard]] bool GetIsDead() const;
-    void SetIsDead(const bool &boat);
+    [[nodiscard]] bool IsDead() const;
+    void SetIsDead(bool isBoat);
 };
 
 

@@ -28,8 +28,8 @@ bool BoatPart::IsDead() const {
     return _isDead;
 }
 
-void BoatPart::SetIsDead(const bool &boat) {
-    _isDead = boat;
+void BoatPart::SetIsDead(const bool isBoat) {
+    _isDead = isBoat;
 }
 
 Boat::Boat(SDL_Rect rect, int size, bool isVertical) : _size{size} {
@@ -50,10 +50,10 @@ bool Boat::CheckIsDead() const {
     return std::all_of(body.begin(), body.end(), [](const BoatPart &boat) {return boat.IsDead();});
 }
 
-bool Boat::GetIsDead() const {
+bool Boat::IsDead() const {
     return _isDead;
 }
 
-void Boat::SetIsDead(const bool &boat) {
-    _isDead = boat;
+void Boat::SetIsDead(const bool isBoat) {
+    _isDead = isBoat;
 }
