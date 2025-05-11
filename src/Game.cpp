@@ -18,13 +18,11 @@ bool Game::GetIsGameOver() const {
     return _gameOver;
 }
 
-bool Game::CheckIsGameOver() {
-    return IsGameStateBattle() &&
-           (IsAllShipsDead(_playerOneGridBoats) or IsAllShipsDead(_playerTwoGridBoats));
+void Game::CheckIsGameOver() {
+    _gameOver = IsGameStateBattle() && IsAllShipsDead();
 }
 
 void Game::update() {
-    _gameOver = CheckIsGameOver();
 }
 
 bool Game::IsGameStateBattle() const { return _gameState; }
@@ -39,11 +37,11 @@ bool Game::IsAllShipsPlaced() const {
     return true;
 };
 
-bool Game::IsAllShipsDead(const std::vector<Boat> &playersBoats) const {
-    return !std::any_of(playersBoats.begin(), playersBoats.end(), [](const Boat &boat) { return !boat.IsDead(); });
+bool Game::IsAllShipsDead() const {
+    return _alivePlayerOneShipCount == 0 || _alivePlayerTwoShipCount == 0;
 }
 
-void Game::SetGameState(bool value) {
+void Game::SetGameState(const bool value) {
     _gameState = value;
 }
 
@@ -83,13 +81,13 @@ void Game::SetRotateAdjust() {
     cout << "adjusted to: " << "x: " << _indexX << " y: " << _indexY << endl;
 }
 
-void Game::setMouseCoordinates(int x, int y) {
+void Game::setMouseCoordinates(const int x, const int y) {
     _mouseX = x;
     _mouseY = y;
     //    cout << "setMouseCoordinates x: " << _mouseX << " y: " << _mouseY << endl;
 }
 
-void Game::setSquareLocation(int x, int y) {
+void Game::setSquareLocation(const int x, const int y) {
     _indexX = x / _gridSize;
     _indexY = y / _gridSize;
 
@@ -206,8 +204,7 @@ Boat *Game::ShotCollideOtherBoats(const SDL_Rect &rect, std::vector<Boat> &other
     return nullptr;
 }
 
-bool Game::IsShipLimitReached(bool isPlayerOne) {
-    //TODO: rename boat to ship
+bool Game::IsShipLimitReached(const bool isPlayerOne) const {
     const int shipSizeToIndex = getShipSize() - 1;
     if (isPlayerOne) {
         if (_placedPlayerOneShipCount[shipSizeToIndex] < _placedPlayerOneShipCountLimit[shipSizeToIndex]) {
@@ -285,6 +282,10 @@ void Game::SaveShip() {
 
     if (IsAllShipsPlaced()) {
         SetGameState(true);
+        for (int i = 0; i < std::size(_placedPlayerOneShipCount); ++i) {
+            _alivePlayerOneShipCount += _placedPlayerOneShipCount[i];
+            _alivePlayerTwoShipCount += _placedPlayerTwoShipCount[i];
+        }
     }
 }
 
@@ -293,7 +294,7 @@ bool Game::IsAllShipPartDamaged(const Boat *damagedBoat) {
                        [](const auto &part) { return part.IsDead(); });
 }
 
-SDL_Rect Game::GetShotPadding(bool isPlayerOne, Boat *damagedBoat) {
+SDL_Rect Game::GetShotPadding(const bool isPlayerOne, const Boat *damagedBoat) const {
     SDL_Rect shipPadding = GetShipsPadding(*damagedBoat);
     shipPadding = MapFromShipGridToShotGrid(isPlayerOne, shipPadding);
     shipPadding = CutShotOutsideGridPlayer(isPlayerOne, shipPadding);
@@ -303,7 +304,7 @@ SDL_Rect Game::GetShotPadding(bool isPlayerOne, Boat *damagedBoat) {
 }
 
 bool Game::MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, vector<Boat> &playerBoats,
-                    vector<GridShot> &playerShots, bool isPlayerOne) {
+                    vector<GridShot> &playerShots, const bool isPlayerOne) {
     //NOTE: player two shots
     if (auto damagedBoat = ShotCollideOtherBoats(damageRect, playerBoats); damagedBoat != nullptr) {
         if (IsAllShipPartDamaged(damagedBoat)) {
@@ -311,6 +312,8 @@ bool Game::MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, vector
             playerShots.emplace_back(GetShotPadding(isPlayerOne, damagedBoat));
             playerShots.emplace_back(shotRect, 0xffff00, true);
             cout << "kill" << endl; //deal damage
+            isPlayerOne ? --_alivePlayerOneShipCount : --_alivePlayerTwoShipCount;
+            CheckIsGameOver();
 
             return true;
         } else {
@@ -327,7 +330,7 @@ bool Game::MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, vector
     return false;
 }
 
-SDL_Rect Game::MapFromShotGridToShipGrid(bool isPlayerOne, const int x, const int y) {
+SDL_Rect Game::MapFromShotGridToShipGrid(const bool isPlayerOne, const int x, const int y) const {
     if (isPlayerOne) {
         return SDL_Rect{
             (x - _tableSize - 2) * _gridSize,
@@ -345,7 +348,7 @@ SDL_Rect Game::MapFromShotGridToShipGrid(bool isPlayerOne, const int x, const in
     }
 }
 
-SDL_Rect Game::MapFromShipGridToShotGrid(bool isPlayerOne, SDL_Rect shipPadding) const {
+SDL_Rect Game::MapFromShipGridToShotGrid(const bool isPlayerOne, const SDL_Rect shipPadding) const {
     if (isPlayerOne) {
         return SDL_Rect{
             shipPadding.x + (_tableSize + 2) * _gridSize,
@@ -503,7 +506,7 @@ SDL_Rect &Game::CutOutsideGridPlayerTwo(SDL_Rect &paddingRect) const {
     return paddingRect;
 }
 
-SDL_Rect &Game::CutShotOutsideGridPlayer(bool isPlayerOne, SDL_Rect &paddingRect) const {
+SDL_Rect &Game::CutShotOutsideGridPlayer(const bool isPlayerOne, SDL_Rect &paddingRect) const {
     if (isPlayerOne) {
         if (paddingRect.x < (_tableSize + 2) * _gridSize) {
             //cut left outside the grid
@@ -549,7 +552,7 @@ SDL_Rect &Game::CutShotOutsideGridPlayer(bool isPlayerOne, SDL_Rect &paddingRect
     return paddingRect;
 }
 
-void Game::drawPlayerShots(SDL_Renderer *renderer) {
+void Game::drawPlayerShots(SDL_Renderer *renderer) const {
     for (const auto &enemyFieldShot: _playerOneGridShots) {
         const SDL_Rect rect = enemyFieldShot.getRect();
 
@@ -639,9 +642,9 @@ void Game::drawHighlightedShip(SDL_Renderer *renderer) {
 void Game::render([[maybe_unused]] SDL_Renderer *renderer) {
 }
 
-void Game::setIsVertical(bool isVertical) { _isVertical = isVertical; }
+void Game::setIsVertical(const bool isVertical) { _isVertical = isVertical; }
 
-void Game::setShipSize(int shipSize) {
+void Game::setShipSize(const int shipSize) {
     _shipSize = shipSize;
     SetRotateAdjust();
 }

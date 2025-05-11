@@ -111,7 +111,6 @@ bool Application::handleInput() {
             }
         }
     }
-    game.update();
     return true;
 }
 
