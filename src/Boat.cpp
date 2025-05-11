@@ -5,9 +5,11 @@ Boat::Boat(SDL_Rect rect) {
     body.emplace_back(rect);
 }
 
-Boat::Boat(const std::list<BoatPart> &body) : body{body} {}
+Boat::Boat(const std::list<BoatPart> &body) : body{body} {
+}
 
-BoatPart::BoatPart(const SDL_Rect rect) : _rect{rect} {}
+BoatPart::BoatPart(const SDL_Rect rect) : _rect{rect} {
+}
 
 SDL_Rect BoatPart::GetRect() const { return _rect; }
 
@@ -48,7 +50,7 @@ void Boat::SetSize(const int size) { _size = size; }
 
 bool Boat::IsDead() const {
     if (!_isDead) {
-        return std::all_of(body.begin(), body.end(), [](const BoatPart &boat) {return boat.IsDead();});
+        return std::all_of(body.begin(), body.end(), [](const BoatPart &boat) { return boat.IsDead(); });
     }
     return _isDead;
 }

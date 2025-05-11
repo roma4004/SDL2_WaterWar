@@ -18,12 +18,12 @@ bool Game::GetIsGameOver() const {
     return _gameOver;
 }
 
-bool Game::CheckIsGameOver(){
+bool Game::CheckIsGameOver() {
     return IsGameStateBattle() &&
            (IsAllShipsDead(_playerOneGridBoats) or IsAllShipsDead(_playerTwoGridBoats));
 }
 
-void Game::update(){
+void Game::update() {
     _gameOver = CheckIsGameOver();
 }
 
@@ -40,7 +40,7 @@ bool Game::IsAllShipsPlaced() const {
 };
 
 bool Game::IsAllShipsDead(const std::vector<Boat> &playersBoats) const {
-    return !std::any_of(playersBoats.begin(), playersBoats.end(), [](const Boat& boat) { return !boat.IsDead();});;
+    return !std::any_of(playersBoats.begin(), playersBoats.end(), [](const Boat &boat) { return !boat.IsDead(); });
 }
 
 void Game::SetGameState(bool value) {
@@ -309,7 +309,7 @@ bool Game::MakeShot(const SDL_Rect &shotRect, const SDL_Rect &damageRect, vector
         if (IsAllShipPartDamaged(damagedBoat)) {
             damagedBoat->SetIsDead(true);
             playerShots.emplace_back(GetShotPadding(isPlayerOne, damagedBoat));
-            playerShots.emplace_back(shotRect, 0xffff00,true);
+            playerShots.emplace_back(shotRect, 0xffff00, true);
             cout << "kill" << endl; //deal damage
 
             return true;
