@@ -6,9 +6,9 @@
 class Renderer {
     SDL_Window *window;
 
-    void setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) const;
+    void SetDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) const;
 
-    void drawLine(int x1, int y1, int x2, int y2) const;
+    void DrawLine(int x1, int y1, int x2, int y2) const;
 
 public:
     SDL_Renderer *renderer;
@@ -19,11 +19,11 @@ public:
 
     bool init();
 
-    void clear() const;
+    void Clear() const;
 
-    void present() const;
+    void Present() const;
 
-    void killSdl();
+    void KillSdl();
 };
 
 #endif // RENDERER_H
