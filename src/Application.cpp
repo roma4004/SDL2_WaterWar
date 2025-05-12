@@ -7,7 +7,7 @@ using namespace std;
 
 Application::Application() = default;
 
-bool Application::init() {
+bool Application::Init() {
     this->renderer = new Renderer();
 
     // Will initialize the window and renderer SDL on init() action
@@ -22,18 +22,18 @@ bool Application::init() {
 
 Application::~Application() = default;
 
-void Application::gameLoop() {
+void Application::GameLoop() {
     const auto *playerShipFild = new GameTable();
     const auto *playerShotFild = new GameTable({12, 0, 40, 40});
 
     const auto *enemyShipFild = new GameTable({0, 12, 40, 40});
     const auto *enemyShotFild = new GameTable({12, 12, 40, 40});
 
-    while (handleInput()) {
+    while (HandleInput()) {
         // Start counting time
         frameStart = SDL_GetTicks();
         // Clear "buffer" before every screen generation
-        renderer->clear();
+        renderer->Clear();
 
         game.drawPlayersShips(renderer->renderer);
         game.drawPlayerShots(renderer->renderer);
@@ -58,11 +58,11 @@ void Application::gameLoop() {
             SDL_Delay(frameDelay - frameTime);
         }
 
-        calculateFPS();
+        CalculateFPS();
     }
 }
 
-bool Application::handleInput() {
+bool Application::HandleInput() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) {
@@ -114,7 +114,7 @@ bool Application::handleInput() {
     return true;
 }
 
-void Application::calculateFPS() {
+void Application::CalculateFPS() {
     frameCount++;
     Uint32 currentTime = SDL_GetTicks();
     if (currentTime - lastTime >= 1000) {

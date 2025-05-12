@@ -2,7 +2,7 @@
 
 GameTable::GameTable() = default;
 
-GameTable::GameTable(SDL_Rect tableRect) : _rect{tableRect} {}
+GameTable::GameTable(const SDL_Rect tableRect) : _rect{tableRect} {}
 
 GameTable::~GameTable() = default;
 

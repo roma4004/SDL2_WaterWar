@@ -13,14 +13,14 @@ public:
     void SetColor (const int &color);
     explicit GridShot(SDL_Rect rect);
 
-    GridShot(SDL_Rect rect, int color,const bool &isBoat);
+    GridShot(SDL_Rect rect, int color, bool isBoat);
 
     [[nodiscard]] SDL_Rect getRect() const;
 
     void setRect(const SDL_Rect &newRect);
 
     [[nodiscard]] bool IsBoat() const;
-    void SetBoat(const bool &boat);
+    void SetBoat(bool boat);
 
 };
 

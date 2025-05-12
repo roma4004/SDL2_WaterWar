@@ -13,14 +13,14 @@ public:
 
     Renderer *renderer{};
 
-    bool init();
+    bool Init();
 
-    void gameLoop();
+    void GameLoop();
 
 private:
-    bool handleInput();
+    bool HandleInput();
 
-    void calculateFPS();
+    void CalculateFPS();
 
     Game game;
 

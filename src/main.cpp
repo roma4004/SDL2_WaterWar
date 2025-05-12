@@ -1,17 +1,18 @@
+#include "Application.h"
+
 #include <iostream>
 #include <SDL.h>
-#include "Application.h"
 
 using namespace std;
 
-int main(int argc, char **args) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     Application app;
 
-    if (!app.init()) {
+    if (!app.Init()) {
         return 1;
     }
 
-    app.gameLoop();
+    app.GameLoop();
 
     return 0;
 }
